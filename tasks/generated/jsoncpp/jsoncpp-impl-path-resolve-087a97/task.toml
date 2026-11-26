@@ -22,8 +22,13 @@ f2p_tests = 1
 p2p_tests = 339
 adversarial_mutants = 6
 adversarial_killed = 6
-difficulty = "medium"
-difficulty_explanation = "Re-implement a 15-line function body from its signature, docs and call sites."
+partial_fixes_rejected = 0
+difficulty = "hard"
+difficulty_score = 3
+difficulty_explanation = "Static estimate (score 3): 1 change location(s) in 1 file(s), 15 line(s) to fix or write, 1 failing test(s) as signal."
+change_locations = 1
+change_files = 1
+change_lines = 15
 category = "feature-implementation"
 
 [verifier]

@@ -22,8 +22,13 @@ f2p_tests = 3
 p2p_tests = 5542
 adversarial_mutants = 4
 adversarial_killed = 3
-difficulty = "medium"
-difficulty_explanation = "Single-token defect (`===` -> `!==`) detected by 3 failing test(s); hint: failing tests only."
+partial_fixes_rejected = 0
+difficulty = "easy"
+difficulty_score = 0
+difficulty_explanation = "Static estimate (score 0): 1 change location(s) in 1 file(s), 1 line(s) to fix or write, 3 failing test(s) as signal."
+change_locations = 1
+change_files = 1
+change_lines = 1
 category = "bug-fix"
 
 [verifier]

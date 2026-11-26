@@ -5,34 +5,47 @@ Strategies
                     change) inside a function; the agent must find and fix it.
   function-removal  a function's body is replaced by a "not implemented" stub
                     (signature and docs kept); the agent must re-implement it.
+  multi-bug         2-3 individually validated bug-injection defects in
+                    different functions (preferably different files) combined
+                    into one task. Patch fragmentation is the strongest
+                    predictor of task difficulty in the literature, so this is
+                    the "hard" tier. Every partial fix must still fail.
 
-For both, the reference solution is the pristine upstream code, and grading
-uses the upstream test suite in a separate verifier sandbox.
+The reference solution is always the pristine upstream code, and grading uses
+the upstream test suite in a separate verifier sandbox.
 
 Pipeline per candidate (every decision is recorded in the report):
   1. screen       run the verifier on the modified tree; F2P = tests that pass
                   on upstream (in both reference runs) but fail now; P2P = tests
                   that still pass. Reject if no test notices the change
                   ("undetected"), if too much of the suite breaks ("too-broad"),
-                  or if nothing could be built/loaded ("build-failure").
-  2. adversarial  apply K plausible wrong fixes (other mutations of the same
-                  function on top of the reference) and grade them with the
-                  task's F2P/P2P lists. Reject if the kill rate is below the
-                  threshold: the tests are too weak to tell a wrong fix apart.
-  3. package      write a complete Harbor task directory.
+                  if nothing could be built/loaded ("build-failure") or if the
+                  run exceeds a timeout ("hangs").
+  2. adversarial  grade plausible wrong fixes with the task's F2P/P2P lists:
+                  operator mutations and statement deletions in the affected
+                  functions, applied on top of the reference (plus, for
+                  multi-bug, every partial fix). Reject if fewer than
+                  --min-wrong-fixes can be built, if any partial fix passes
+                  ("masked-bugs"), or if the kill rate is below the threshold
+                  ("weak-tests").
+  3. package      write a complete Harbor task directory with a static
+                  difficulty score.
 
 Usage:
   python factory/generate.py --repo click --strategy bug-injection --count 5 --seed 1
+  python factory/generate.py --repo click --strategy multi-bug --bugs 2 --count 2 --seed 1
 """
 
 from __future__ import annotations
 
 import argparse
+import ast
 import concurrent.futures as cf
 import difflib
 import gzip
 import hashlib
 import io
+import itertools
 import json
 import random
 import re
@@ -56,7 +69,7 @@ from common import _open_archive  # noqa: E402
 from repos import REPOS, RepoConfig  # noqa: E402
 
 LOCK = threading.Lock()
-SHORT = {"bug-injection": "bug", "function-removal": "impl"}
+SHORT = {"bug-injection": "bug", "function-removal": "impl", "multi-bug": "multi"}
 
 
 def sha(*parts: str) -> str:
@@ -73,7 +86,7 @@ def log(msg: str) -> None:
 
 
 # ----------------------------------------------------------------------------
-# Upstream tree, verifier image, reference results
+# Upstream tree, verifier image, test runs
 
 def upstream_tree(cfg: RepoConfig) -> Path:
     dest = CACHE / cfg.name / "upstream"
@@ -106,9 +119,17 @@ def verifier_image(cfg: RepoConfig) -> str:
     return tag
 
 
-def run_tests(cfg: RepoConfig, image: str, upstream: Path, edits: dict[str, str], key: str,
+def edits_key(prefix: str, files: dict[str, str]) -> str:
+    # single-file keys keep the original format so cached runs stay valid
+    if len(files) == 1:
+        (rel, text), = files.items()
+        return f"{prefix}:{rel}:{text}"
+    return f"{prefix}:" + json.dumps(sorted(files.items()))
+
+
+def run_tests(cfg: RepoConfig, image: str, upstream: Path, files: dict[str, str], key: str,
               timeout: float | None = None) -> dict[str, str]:
-    """Per-test results for upstream + edits, graded by the repo's verifier (cached).
+    """Per-test results for upstream + modified files, graded by the repo's verifier (cached).
 
     A run that exceeds `timeout` (e.g. a mutation that creates an infinite loop)
     is killed and recorded as {"__timeout__": "failed"}."""
@@ -124,7 +145,7 @@ def run_tests(cfg: RepoConfig, image: str, upstream: Path, edits: dict[str, str]
             rel = Path(source).relative_to("/app")
             shutil.copytree(upstream / rel, tmp / "app" / rel, symlinks=True)
             mounts += ["-v", f"{tmp / 'app' / rel}:{source}"]
-        for rel, text in edits.items():
+        for rel, text in files.items():
             (tmp / "app" / rel).write_text(text)
         (tmp / "logs").mkdir()
         try:
@@ -155,17 +176,45 @@ def grade(results: dict[str, str], f2p: list[str], p2p: list[str]) -> int:
 # Candidates
 
 @dataclass
+class Edit:
+    file: str
+    start: int  # offsets into the upstream text
+    end: int
+    new: str
+
+
+@dataclass
 class Candidate:
     id: str
     strategy: str
-    file: str
-    function: str
-    line: int
-    new_text: str
+    edits: list[Edit]
+    functions: list[Function]
     description: str
-    site: Site | None = None  # injected site (bug-injection)
-    replacement: str = ""
-    fn: Function | None = field(default=None, repr=False)
+    injected: list[tuple[Site, str]] = field(default_factory=list)  # (site, replacement) for bug kinds
+    parts: list["Candidate"] = field(default_factory=list)  # components of a multi-bug task
+
+    @property
+    def files(self) -> list[str]:
+        return sorted({e.file for e in self.edits})
+
+    @property
+    def function_names(self) -> str:
+        return ", ".join(fn.name for fn in self.functions)
+
+
+def apply_edits(texts: dict[str, str], edits: list[Edit]) -> dict[str, str]:
+    """Modified file texts; edits within a file must not overlap."""
+    out: dict[str, str] = {}
+    for rel in sorted({e.file for e in edits}):
+        text = texts[rel]
+        last = len(text) + 1
+        for e in sorted((e for e in edits if e.file == rel), key=lambda e: e.start, reverse=True):
+            if e.end > last:
+                raise ValueError(f"overlapping edits in {rel}")
+            text = text[:e.start] + e.new + text[e.end:]
+            last = e.start
+        out[rel] = text
+    return out
 
 
 def source_files(cfg: RepoConfig, root: Path) -> list[str]:
@@ -178,8 +227,8 @@ def body_lines(text: str, fn: Function) -> int:
                if line.strip() and not line.strip().startswith(("#", "//")))
 
 
-def slug(name: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", name.lower().replace("$", "")).strip("-")[:40]
+def slug(name: str, limit: int = 40) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", name.lower().replace("$", "")).strip("-")[:limit].strip("-")
 
 
 def interleave_by_file(fns: list[Function], rng: random.Random) -> list[Function]:
@@ -211,35 +260,114 @@ def enumerate_candidates(cfg: RepoConfig, strategy: str, fns: list[Function], te
             new_text = text[:site.start] + repl + text[site.end:]
             desc = f"`{site.text}` -> `{repl}`" if repl else f"removed `{site.text.strip()}`"
             cid = f"{cfg.name}-bug-{slug(fn.name)}-{sha(fn.file, new_text)[:6]}"
-            yield Candidate(cid, strategy, fn.file, fn.name, fn.line, new_text, desc, site, repl, fn)
+            yield Candidate(cid, strategy, [Edit(fn.file, site.start, site.end, repl)], [fn], desc,
+                            injected=[(site, repl)])
         elif strategy == "function-removal":
             n = body_lines(text, fn)
             if not 3 <= n <= 60 or fn.name.split(".")[-1].startswith("__"):
                 continue
             new_text = removal_stub(cfg.language, fn, text)
             cid = f"{cfg.name}-impl-{slug(fn.name)}-{sha(fn.file, new_text)[:6]}"
-            yield Candidate(cid, strategy, fn.file, fn.name, fn.line, new_text, f"body removed ({n} lines)",
-                            fn=fn)
+            yield Candidate(cid, strategy, [Edit(fn.file, 0, len(text), new_text)], [fn],
+                            f"body removed ({n} lines)")
         else:
             raise ValueError(strategy)
 
 
-def wrong_fixes(cand: Candidate, upstream_text: str, rng: random.Random, k: int) -> list[tuple[str, str]]:
-    """Plausible wrong solutions: the reference with one other mutation in the same function."""
-    options = []
-    for s in cand.fn.sites:
-        for repl in mutations_for(s):
-            if cand.site is not None and s.start == cand.site.start:
-                continue  # handled below
-            options.append((f"{s.text.strip()} -> {repl or '(removed)'} @ offset {s.start}",
-                            upstream_text[:s.start] + repl + upstream_text[s.end:]))
-    if cand.site is not None:  # other "fixes" at the injected site
-        for repl in mutations_for(cand.site):
-            if repl != cand.replacement:
-                options.append((f"injected site {cand.site.text.strip()} -> {repl or '(removed)'}",
-                                upstream_text[:cand.site.start] + repl + upstream_text[cand.site.end:]))
-    rng.shuffle(options)
-    return options[:k]
+def _valid(cfg: RepoConfig, rel: str, text: str) -> bool:
+    if cfg.language == "python":
+        try:
+            ast.parse(text)
+        except SyntaxError:
+            return False
+    return True
+
+
+def wrong_fixes(cfg: RepoConfig, cand: Candidate, texts: dict[str, str], rng: random.Random,
+                k: int) -> tuple[list[tuple[str, dict[str, str]]], list[tuple[str, dict[str, str]]]]:
+    """(must_kill, sampled) plausible wrong solutions.
+
+    must_kill: for multi-bug tasks, every partial fix (some injected bugs left in).
+    sampled:   up to k of: the reference with one other operator mutation or one
+               statement deletion in an affected function, or a different
+               "fix" at an injected site. Operator and deletion options are
+               interleaved so both kinds are represented."""
+    must = []
+    if cand.parts:
+        n = len(cand.parts)
+        for size in range(1, n):
+            for remaining in itertools.combinations(range(n), size):
+                edits = [e for i in remaining for e in cand.parts[i].edits]
+                names = " + ".join(cand.parts[i].functions[0].name for i in remaining)
+                must.append((f"partial fix (still broken: {names})", apply_edits(texts, edits)))
+
+    injected_starts = {s.start for s, _ in cand.injected}
+    ops, dels = [], []
+    for fn in cand.functions:
+        upstream_text = texts[fn.file]
+        for s in fn.sites:
+            for repl in mutations_for(s):
+                if s.start in injected_starts and any(repl == r for st, r in cand.injected if st.start == s.start):
+                    continue  # that is the injected bug itself, not a wrong fix
+                new = upstream_text[:s.start] + repl + upstream_text[s.end:]
+                where = "injected site" if s.start in injected_starts else f"offset {s.start}"
+                ops.append((f"{fn.name}: {s.text.strip()} -> {repl or '(removed)'} @ {where}", {fn.file: new}))
+        for s in fn.deletions:
+            repl = mutations_for(s)[0]
+            new = upstream_text[:s.start] + repl + upstream_text[s.end:]
+            first = s.text.strip().splitlines()[0][:60]
+            dels.append((f"{fn.name}: deleted `{first}`", {fn.file: new}))
+    rng.shuffle(ops)
+    rng.shuffle(dels)
+    sampled = []
+    for a, b in itertools.zip_longest(ops, dels):
+        for opt in (a, b):
+            if opt is not None and len(sampled) < k and all(_valid(cfg, r, t) for r, t in opt[1].items()):
+                sampled.append(opt)
+        if len(sampled) >= k:
+            break
+    return must, sampled
+
+
+# ----------------------------------------------------------------------------
+# Difficulty (static, pre-hoc)
+
+def change_features(cand: Candidate, texts: dict[str, str], f2p: list[str]) -> dict:
+    """Static features that predict agent difficulty: patch fragmentation
+    (locations), files, size, and how directly failing tests point at it."""
+    new_texts = apply_edits(texts, cand.edits)
+    locations = lines = 0
+    for rel, new in new_texts.items():
+        sm = difflib.SequenceMatcher(None, texts[rel].splitlines(), new.splitlines(), autojunk=False)
+        for tag, i1, i2, _, _ in sm.get_opcodes():
+            if tag != "equal":
+                locations += 1
+                lines += max(i2 - i1, 1)
+    if cand.strategy == "function-removal":
+        # one function to re-implement; the stub's helper include (C++) is not a location
+        locations, lines = 1, body_lines(texts[cand.functions[0].file], cand.functions[0])
+    signal = len(display_tests(f2p, limit=10 ** 6))
+    return {"locations": locations, "files": len(new_texts), "lines": lines, "failing_tests": signal}
+
+
+def difficulty(cand: Candidate, feats: dict) -> tuple[str, int, str]:
+    """Points: fragmentation dominates (2+ locations), then cross-file changes,
+    amount of code to write, and the failure signal (a strong signal only makes a
+    single-location change easier). <=0 easy, 1-2 medium, >=3 hard."""
+    score = {1: 0, 2: 2}.get(feats["locations"], 3 if feats["locations"] >= 3 else 0)
+    score += 1 if feats["files"] > 1 else 0
+    if cand.strategy == "function-removal":
+        score += 1 if feats["lines"] <= 8 else 2 if feats["lines"] <= 25 else 3
+    elif feats["lines"] > 2:
+        score += 1
+    if feats["failing_tests"] <= 2:
+        score += 1  # weak signal: hard to localise
+    elif feats["failing_tests"] >= 30 and feats["locations"] == 1:
+        score -= 1  # many failures pointing at a single change make it easy to find
+    level = "easy" if score <= 0 else "medium" if score <= 2 else "hard"
+    why = (f"Static estimate (score {score}): {feats['locations']} change location(s) in {feats['files']} file(s), "
+           f"{feats['lines']} line(s) to fix or write, {feats['failing_tests']} failing test(s) as signal.")
+    return level, score, why
 
 
 # ----------------------------------------------------------------------------
@@ -290,7 +418,7 @@ def display_tests(tests: list[str], limit: int = 5) -> list[str]:
     return out[:limit] + ([f"... and {len(out) - limit} more"] if len(out) > limit else [])
 
 
-def instruction(cfg: RepoConfig, cand: Candidate, f2p: list[str], upstream_text: str) -> str:
+def instruction(cfg: RepoConfig, cand: Candidate, f2p: list[str], texts: dict[str, str]) -> str:
     src_dirs = sorted({str(Path(g).parent) for g in cfg.source_globs})
     where = ", ".join(f"`/app/{d}`" for d in src_dirs)
     failing = "\n".join(f"- `{t}`" if not t.startswith("...") else f"- {t}" for t in display_tests(f2p))
@@ -303,7 +431,18 @@ def instruction(cfg: RepoConfig, cand: Candidate, f2p: list[str], upstream_text:
             "original test suite, and every test that passed before the regression must still pass.\n\n"
             f"{cfg.test_hint}\n"
         )
-    fn = cand.fn
+    if cand.strategy == "multi-bug":
+        return (
+            f"Several regressions ({len(cand.parts)}) have been introduced into the {cfg.project} library in "
+            f"`/app` (library source under {where}). They are independent defects in different parts of the "
+            f"library. These tests currently fail:\n\n{failing}\n\n"
+            "Find and fix every defect in the library source. Fixing only some of them is not enough: all of "
+            "the tests above must pass. Do not modify the tests; grading uses the original test suite, and "
+            "every test that passed before the regressions must still pass.\n\n"
+            f"{cfg.test_hint}\n"
+        )
+    fn = cand.functions[0]
+    upstream_text = texts[fn.file]
     lang = {"python": "python", "typescript": "ts", "cpp": "cpp"}[cfg.language]
     signature = upstream_text[fn.start:fn.body_start].rstrip()
     doc = fn.doc.strip()
@@ -324,32 +463,21 @@ def instruction(cfg: RepoConfig, cand: Candidate, f2p: list[str], upstream_text:
     )
 
 
-def difficulty(cand: Candidate, f2p: list[str], upstream_text: str) -> tuple[str, str]:
-    if cand.strategy == "function-removal":
-        n = body_lines(upstream_text, cand.fn)
-        level = "easy" if n <= 8 else "medium" if n <= 25 else "hard"
-        return level, f"Re-implement a {n}-line function body from its signature, docs and call sites."
-    n = len(display_tests(f2p, limit=10**6))
-    level = "hard" if n <= 2 else "medium" if n <= 10 else "easy"
-    return level, f"Single-token defect ({cand.description}) detected by {n} failing test(s); hint: failing tests only."
-
-
 def toml_str(value) -> str:
     return json.dumps(value) if isinstance(value, str) else str(value).lower() if isinstance(value, bool) else str(value)
 
 
 def package(cfg: RepoConfig, cand: Candidate, f2p: list[str], p2p: list[str], adv: dict,
-            upstream: Path, out_root: Path, seed: int) -> Path:
+            upstream: Path, texts: dict[str, str], out_root: Path, seed: int) -> Path:
     task = out_root / cand.id
     if task.exists():
         shutil.rmtree(task)
-    upstream_text = (upstream / cand.file).read_text()
-    edits = {cand.file: cand.new_text}
+    new_files = apply_edits(texts, cand.edits)
 
     # environment
     shutil.copytree(FACTORY / "templates" / cfg.name / "environment", task / "environment")
     (task / "environment" / "vendor").mkdir()
-    write_archive(cfg, upstream, edits, task / "environment" / "vendor" / f"app-base.{cfg.archive_ext}")
+    write_archive(cfg, upstream, new_files, task / "environment" / "vendor" / f"app-base.{cfg.archive_ext}")
     for extra in cfg.env_vendor:
         src = FACTORY / "vendor" / cfg.name / extra
         (shutil.copytree if src.is_dir() else shutil.copy2)(src, task / "environment" / "vendor" / extra)
@@ -364,39 +492,48 @@ def package(cfg: RepoConfig, cand: Candidate, f2p: list[str], p2p: list[str], ad
     (task / "tests" / "f2p.txt").write_text("\n".join(f2p) + "\n")
     (task / "tests" / "p2p.txt").write_text("\n".join(p2p) + "\n")
 
-    # reference solution
-    sol = task / "solution" / "files" / cand.file
-    sol.parent.mkdir(parents=True)
-    sol.write_text(upstream_text)
+    # reference solution: the pristine upstream files
+    copies = []
+    for rel in new_files:
+        sol = task / "solution" / "files" / rel
+        sol.parent.mkdir(parents=True, exist_ok=True)
+        sol.write_text(texts[rel])
+        copies.append(f"cp /solution/files/{rel} /app/{rel}")
     (task / "solution" / "solve.sh").write_text(
-        "#!/bin/bash\n# Reference solution: the pristine upstream file\n"
-        f"# ({cfg.url} @ {cfg.commit}).\nset -euo pipefail\n"
-        f"cp /solution/files/{cand.file} /app/{cand.file}\n")
+        "#!/bin/bash\n# Reference solution: the pristine upstream file(s)\n"
+        f"# ({cfg.url} @ {cfg.commit}).\nset -euo pipefail\n" + "\n".join(copies) + "\n")
     (task / "solution" / "solve.sh").chmod(0o755)
     (task / "tests" / "test.sh").chmod(0o755)
 
-    (task / "instruction.md").write_text(instruction(cfg, cand, f2p, upstream_text))
-    diff = difflib.unified_diff(upstream_text.splitlines(keepends=True), cand.new_text.splitlines(keepends=True),
-                                f"a/{cand.file}", f"b/{cand.file}")
-    (task / "task_edit.diff").write_text("".join(diff))
+    (task / "instruction.md").write_text(instruction(cfg, cand, f2p, texts))
+    diff = "".join("".join(difflib.unified_diff(texts[rel].splitlines(keepends=True),
+                                                 new_files[rel].splitlines(keepends=True),
+                                                 f"a/{rel}", f"b/{rel}")) for rel in sorted(new_files))
+    (task / "task_edit.diff").write_text(diff)
 
-    level, why = difficulty(cand, f2p, upstream_text)
+    feats = change_features(cand, texts, f2p)
+    level, score, why = difficulty(cand, feats)
     r = cfg.resources
+    category = "feature-implementation" if cand.strategy == "function-removal" else "bug-fix"
     meta = {
         "generator": cand.strategy, "seed": seed, "source_repo": cfg.url, "source_commit": cfg.commit,
-        "language": cfg.language, "file": cand.file, "function": cand.function, "line": cand.line,
-        "change": cand.description, "f2p_tests": len(f2p), "p2p_tests": len(p2p),
+        "language": cfg.language, "file": ", ".join(cand.files), "function": cand.function_names,
+        "line": cand.functions[0].line, "change": cand.description,
+        "f2p_tests": len(f2p), "p2p_tests": len(p2p),
         "adversarial_mutants": adv["mutants"], "adversarial_killed": adv["killed"],
-        "difficulty": level, "difficulty_explanation": why,
-        "category": "bug-fix" if cand.strategy == "bug-injection" else "feature-implementation",
+        "partial_fixes_rejected": adv.get("partial_killed", 0),
+        "difficulty": level, "difficulty_score": score, "difficulty_explanation": why,
+        "change_locations": feats["locations"], "change_files": feats["files"], "change_lines": feats["lines"],
+        "category": category,
     }
     artifacts = ", ".join(f'{{ source = "{a}" }}' for a in cfg.artifacts)
-    desc = (f"Fix a regression injected into {cand.function} ({cand.file})" if cand.strategy == "bug-injection"
-            else f"Re-implement {cand.function} ({cand.file})")
+    desc = {"bug-injection": f"Fix a regression injected into {cand.function_names} ({', '.join(cand.files)})",
+            "multi-bug": f"Fix {len(cand.parts)} independent regressions in {cand.function_names}",
+            "function-removal": f"Re-implement {cand.function_names} ({', '.join(cand.files)})"}[cand.strategy]
     toml = [
         'schema_version = "1.4"', f"artifacts = [{artifacts}]", "", "[task]",
         f'name = "coding-task-factory/{cand.id}"', 'version = "1.0.0"', f"description = {toml_str(desc)}",
-        "authors = []", f'keywords = ["{cfg.language}", "{cfg.name}", "{meta["category"]}", "generated"]', "",
+        "authors = []", f'keywords = ["{cfg.language}", "{cfg.name}", "{category}", "generated"]', "",
         "[metadata]", *[f"{k} = {toml_str(v)}" for k, v in meta.items()], "",
         "[verifier]", f"timeout_sec = {float(r['verifier_timeout'])}", 'environment_mode = "separate"', "",
         "[verifier.environment]", "build_timeout_sec = 900.0", 'os = "linux"',
@@ -411,14 +548,50 @@ def package(cfg: RepoConfig, cand: Candidate, f2p: list[str], p2p: list[str], ad
 
 # ----------------------------------------------------------------------------
 
+def compose_groups(cfg: RepoConfig, singles: list[Candidate], bugs: int, texts: dict[str, str]):
+    """Deterministically group validated single bugs: distinct functions,
+    non-overlapping edits, preferring different files."""
+    used: set[str] = set()
+    for i, first in enumerate(singles):
+        if first.id in used:
+            continue
+        group = [first]
+        for prefer_new_file in (True, False):
+            for other in singles[i + 1:]:
+                if len(group) == bugs:
+                    break
+                if other.id in used or any(other.functions[0].name == g.functions[0].name and
+                                           other.functions[0].file == g.functions[0].file for g in group):
+                    continue
+                if prefer_new_file and other.files[0] in {f for g in group for f in g.files}:
+                    continue
+                group.append(other)
+        if len(group) < bugs:
+            continue
+        edits = [e for g in group for e in g.edits]
+        try:
+            apply_edits(texts, edits)
+        except ValueError:  # overlapping edits (nested functions); skip this grouping
+            continue
+        used.update(g.id for g in group)
+        fns = [g.functions[0] for g in group]
+        cid = f"{cfg.name}-multi-" + "-".join(slug(f.name.split('.')[-1].split('::')[-1], 18) for f in fns) + \
+              "-" + sha(*[g.id for g in group])[:6]
+        desc = "; ".join(f"{g.functions[0].name}: {g.description}" for g in group)
+        yield Candidate(cid, "multi-bug", edits, fns, desc,
+                        injected=[x for g in group for x in g.injected], parts=group)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--repo", required=True, choices=sorted(REPOS))
     ap.add_argument("--strategy", required=True, choices=sorted(SHORT))
     ap.add_argument("--count", type=int, default=5, help="tasks to produce")
+    ap.add_argument("--bugs", type=int, default=2, help="defects per multi-bug task (2-3)")
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--max-attempts", type=int, default=0, help="candidates to try (default 8x count)")
-    ap.add_argument("--adversarial", type=int, default=6, help="wrong fixes tried per task")
+    ap.add_argument("--adversarial", type=int, default=6, help="sampled wrong fixes per task")
+    ap.add_argument("--min-wrong-fixes", type=int, default=3)
     ap.add_argument("--min-kill-rate", type=float, default=0.75)
     ap.add_argument("--max-f2p-fraction", type=float, default=0.25)
     ap.add_argument("--workers", type=int, default=0)
@@ -427,8 +600,12 @@ def main() -> int:
 
     cfg = REPOS[args.repo]
     started = time.time()
-    rng = random.Random(f"{cfg.name}:{args.strategy}:{args.seed}")
-    max_attempts = args.max_attempts or args.count * 8
+    # multi-bug draws its single bugs from its own seeded stream, so its defects
+    # differ from the ones used by bug-injection tasks with the same seed
+    rng_key = f"{cfg.name}:{args.strategy}:{args.seed}"
+    if args.strategy == "multi-bug" and args.bugs != 2:
+        rng_key += f":bugs{args.bugs}"  # its own pool, so tasks don't reuse the 2-bug tasks' defects
+    rng = random.Random(rng_key)
     workers = args.workers or cfg.workers
 
     upstream = upstream_tree(cfg)
@@ -455,113 +632,142 @@ def main() -> int:
     texts = {f: (upstream / f).read_text() for f in files}
     ts_module = CACHE / "zod" / "node_modules" / "typescript" if cfg.language == "typescript" else None
     fns = find_functions(cfg.language, upstream, files, ts_module)
-    log(f"[..] {len(files)} source files, {len(fns)} functions, {sum(len(f.sites) for f in fns)} mutation sites")
-
-    candidates = enumerate_candidates(cfg, args.strategy, fns, texts, rng)
-    adv_rng_seed = f"{cfg.name}:{args.strategy}:{args.seed}:adversarial"
-    records: list[dict] = []
-    accepted: list[tuple[Candidate, list[str], list[str], dict]] = []
+    log(f"[..] {len(files)} source files, {len(fns)} functions, {sum(len(f.sites) for f in fns)} mutation sites, "
+        f"{sum(len(f.deletions) for f in fns)} deletion sites")
+    adv_seed = f"{cfg.name}:{args.strategy}:{args.seed}:adversarial"
 
     def evaluate(cand: Candidate, index: int) -> dict:
-        rec = {"index": index, "id": cand.id, "file": cand.file, "function": cand.function, "line": cand.line,
-               "change": cand.description}
-        results = run_tests(cfg, image, upstream, {cand.file: cand.new_text}, f"cand:{cand.file}:{cand.new_text}",
-                            run_timeout)
+        rec = {"index": index, "id": cand.id, "file": ", ".join(cand.files), "function": cand.function_names,
+               "line": cand.functions[0].line, "change": cand.description}
+        new_files = apply_edits(texts, cand.edits)
+        results = run_tests(cfg, image, upstream, new_files, edits_key("cand", new_files), run_timeout)
         if "__timeout__" in results:
             return {**rec, "status": "rejected", "reason": "hangs"}
         if not results:
             return {**rec, "status": "rejected", "reason": "build-failure"}
         now = passed(results)
-        f2p = sorted(stable - now)
-        p2p = sorted(stable & now)
+        f2p, p2p = sorted(stable - now), sorted(stable & now)
         rec.update(f2p=len(f2p), p2p=len(p2p))
         if not f2p:
             return {**rec, "status": "rejected", "reason": "undetected"}
         if len(f2p) > args.max_f2p_fraction * len(stable):
             return {**rec, "status": "rejected", "reason": "too-broad"}
-        fixes = wrong_fixes(cand, texts[cand.file], random.Random(f"{adv_rng_seed}:{cand.id}"), args.adversarial)
-        if not fixes:
-            return {**rec, "status": "rejected", "reason": "no-adversarial-sites"}
-        killed, survivors = 0, []
-        for desc, text in fixes:
-            res = run_tests(cfg, image, upstream, {cand.file: text}, f"adv:{cand.file}:{text}", run_timeout)
+        must, sampled = wrong_fixes(cfg, cand, texts, random.Random(f"{adv_seed}:{cand.id}"), args.adversarial)
+        if len(must) + len(sampled) < args.min_wrong_fixes:
+            return {**rec, "status": "rejected", "reason": "too-few-wrong-fixes"}
+        partial_killed, killed, survivors = 0, 0, []
+        for desc, files_ in must:
+            res = run_tests(cfg, image, upstream, files_, edits_key("adv", files_), run_timeout)
+            if grade(res, f2p, p2p) == 0:
+                partial_killed += 1
+            else:
+                survivors.append(desc)
+        for desc, files_ in sampled:
+            res = run_tests(cfg, image, upstream, files_, edits_key("adv", files_), run_timeout)
             if grade(res, f2p, p2p) == 0:
                 killed += 1
             else:
                 survivors.append(desc)
-        rate = killed / len(fixes)
-        adv = {"mutants": len(fixes), "killed": killed, "kill_rate": round(rate, 3), "survivors": survivors}
+        total = len(must) + len(sampled)
+        rate = (killed + partial_killed) / total
+        adv = {"mutants": total, "killed": killed + partial_killed, "kill_rate": round(rate, 3),
+               "partial_fixes": len(must), "partial_killed": partial_killed, "survivors": survivors}
         rec.update(adversarial=adv)
+        if partial_killed < len(must):
+            return {**rec, "status": "rejected", "reason": "masked-bugs"}
         if rate < args.min_kill_rate:
             return {**rec, "status": "rejected", "reason": "weak-tests"}
         rec["_payload"] = (cand, f2p, p2p, adv)
         return {**rec, "status": "accepted"}
 
-    attempts = 0
-    with cf.ThreadPoolExecutor(max_workers=workers) as pool:
-        pending: dict[cf.Future, Candidate] = {}
-        exhausted = False
-        while True:
-            while not exhausted and len(pending) < workers and attempts < max_attempts \
-                    and len(accepted) + len(pending) < args.count + workers:
-                if len(accepted) >= args.count:
+    def run_stage(candidates, target: int, max_attempts: int, label: str) -> tuple[list, list, int]:
+        """Evaluate candidates in parallel until `target` are accepted; returns
+        (accepted payloads in enumeration order, records, attempts)."""
+        records, accepted = [], []
+        attempts = 0
+        with cf.ThreadPoolExecutor(max_workers=workers) as pool:
+            pending: dict[cf.Future, Candidate] = {}
+            exhausted = False
+            while True:
+                while not exhausted and len(pending) < workers and attempts < max_attempts \
+                        and len(accepted) < target:
+                    cand = next(candidates, None)
+                    if cand is None:
+                        exhausted = True
+                        break
+                    attempts += 1
+                    pending[pool.submit(evaluate, cand, attempts)] = cand
+                if not pending:
                     break
-                cand = next(candidates, None)
-                if cand is None:
-                    exhausted = True
-                    break
-                attempts += 1
-                pending[pool.submit(evaluate, cand, attempts)] = cand
-            if not pending:
-                break
-            done, _ = cf.wait(pending, return_when=cf.FIRST_COMPLETED)
-            for fut in done:
-                pending.pop(fut)
-                rec = fut.result()
-                if rec["status"] == "accepted":
-                    accepted.append((rec["index"], rec["_payload"]))
-                records.append(rec)
-                extra = f" f2p={rec.get('f2p')} kill={rec.get('adversarial', {}).get('kill_rate')}" \
-                    if "f2p" in rec else ""
-                log(f"[{'OK' if rec['status'] == 'accepted' else '--'}] {rec['id']:<60} {rec['status']}"
-                    f"{' (' + rec.get('reason', '') + ')' if rec.get('reason') else ''}{extra}")
-            if len(accepted) >= args.count and not pending:
-                break
+                done, _ = cf.wait(pending, return_when=cf.FIRST_COMPLETED)
+                for fut in done:
+                    pending.pop(fut)
+                    rec = fut.result()
+                    if rec["status"] == "accepted":
+                        accepted.append((rec["index"], rec["_payload"]))
+                    records.append(rec)
+                    extra = f" f2p={rec.get('f2p')} kill={rec.get('adversarial', {}).get('kill_rate')}" \
+                        if "f2p" in rec else ""
+                    log(f"[{'OK' if rec['status'] == 'accepted' else '--'}] ({label}) {rec['id']:<62} {rec['status']}"
+                        f"{' (' + rec.get('reason', '') + ')' if rec.get('reason') else ''}{extra}")
+        # first `target` accepted in enumeration order: independent of thread timing
+        accepted.sort(key=lambda t: t[0])
+        keep = {idx for idx, _ in accepted[:target]}
+        for rec in records:
+            rec.pop("_payload", None)
+            if rec["status"] == "accepted" and rec["index"] not in keep:
+                rec.update(status="surplus", reason="target count already reached")
+        return [p for idx, p in accepted if idx in keep], sorted(records, key=lambda r: r["index"]), attempts
 
-    # Keep the first `count` accepted candidates in enumeration (seed) order, so
-    # the result never depends on which parallel run finished first.
-    accepted.sort(key=lambda t: t[0])
-    keep = {idx for idx, _ in accepted[:args.count]}
-    for rec in records:
-        rec.pop("_payload", None)
-        if rec["status"] == "accepted" and rec["index"] not in keep:
-            rec.update(status="surplus", reason="target count already reached")
-    accepted = [payload for idx, payload in accepted if idx in keep]
+    singles_stage = None
+    if args.strategy == "multi-bug":
+        # stage 1: a pool of individually validated single bugs
+        pool_target = args.count * args.bugs + args.bugs
+        singles_iter = enumerate_candidates(cfg, "bug-injection", fns, texts, rng)
+        pool, pool_records, pool_attempts = run_stage(singles_iter, pool_target,
+                                                      args.max_attempts or pool_target * 8, "single")
+        singles = [p[0] for p in pool]
+        singles_stage = {"candidates_tried": pool_attempts, "validated_bugs": len(singles),
+                         "funnel": funnel(pool_records)}
+        log(f"[..] {len(singles)} validated single bugs for composition")
+        accepted, records, attempts = run_stage(compose_groups(cfg, singles, args.bugs, texts), args.count,
+                                                10 ** 6, "multi")
+    else:
+        accepted, records, attempts = run_stage(enumerate_candidates(cfg, args.strategy, fns, texts, rng),
+                                                args.count, args.max_attempts or args.count * 8, "task")
 
     out_root = args.out / cfg.name
     out_root.mkdir(parents=True, exist_ok=True)
     for cand, f2p, p2p, adv in accepted:
-        package(cfg, cand, f2p, p2p, adv, upstream, out_root, args.seed)
+        package(cfg, cand, f2p, p2p, adv, upstream, texts, out_root, args.seed)
 
-    funnel: dict[str, int] = {}
-    for rec in records:
-        key = rec["status"] if rec["status"] != "rejected" else f"rejected:{rec['reason']}"
-        funnel[key] = funnel.get(key, 0) + 1
     report = {
         "repo": cfg.name, "strategy": args.strategy, "seed": args.seed, "count_requested": args.count,
-        "candidates_tried": attempts, "accepted": len(accepted), "funnel": dict(sorted(funnel.items())),
+        "candidates_tried": attempts, "accepted": len(accepted), "funnel": funnel(records),
         "reference": {"tests": len(ref1), "stable_passing": len(stable), "flaky": len(flaky)},
         "thresholds": {"min_kill_rate": args.min_kill_rate, "max_f2p_fraction": args.max_f2p_fraction,
-                       "adversarial_per_task": args.adversarial},
+                       "adversarial_per_task": args.adversarial, "min_wrong_fixes": args.min_wrong_fixes},
         "tasks": [c.id for c, *_ in accepted],
         "elapsed_sec": round(time.time() - started, 1),
-        "candidates": sorted(records, key=lambda r: r["index"]),
+        "candidates": records,
     }
-    report_path = out_root / f"report-{SHORT[args.strategy]}-seed{args.seed}.json"
+    if singles_stage:
+        report["bugs_per_task"] = args.bugs
+        report["single_bug_stage"] = singles_stage
+    suffix = f"{SHORT[args.strategy]}{args.bugs if args.strategy == 'multi-bug' else ''}"
+    report_path = out_root / f"report-{suffix}-seed{args.seed}.json"
     report_path.write_text(json.dumps(report, indent=2) + "\n")
     log(f"[OK] {len(accepted)}/{args.count} tasks from {attempts} candidates in {report['elapsed_sec']}s; "
         f"funnel {report['funnel']}; report {report_path.relative_to(ROOT)}")
     return 0 if len(accepted) == args.count else 2
+
+
+def funnel(records: list[dict]) -> dict[str, int]:
+    out: dict[str, int] = {}
+    for rec in records:
+        key = rec["status"] if rec["status"] != "rejected" else f"rejected:{rec['reason']}"
+        out[key] = out.get(key, 0) + 1
+    return dict(sorted(out.items()))
 
 
 if __name__ == "__main__":

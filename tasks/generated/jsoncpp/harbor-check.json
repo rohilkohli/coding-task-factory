@@ -1,13 +1,13 @@
 {
-  "tasks": 6,
-  "passed": 6,
+  "tasks": 9,
+  "passed": 9,
   "results": {
     "jsoncpp-bug-fastwriter-writevalue-be51db": {
       "oracle": 1,
       "nop": 0,
       "ok": true
     },
-    "jsoncpp-bug-ourreader-decodestring-06c621": {
+    "jsoncpp-bug-ourreader-getlocationlineandcolumn-e0d025": {
       "oracle": 1,
       "nop": 0,
       "ok": true
@@ -22,12 +22,27 @@
       "nop": 0,
       "ok": true
     },
+    "jsoncpp-impl-ourreader-readcppstylecomment-fcbe5f": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
     "jsoncpp-impl-path-resolve-087a97": {
       "oracle": 1,
       "nop": 0,
       "ok": true
     },
-    "jsoncpp-impl-styledstreamwriter-ismultilinearray-fef4cc": {
+    "jsoncpp-multi-unindent-isconvertibleto-readarray-bd1d50": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "jsoncpp-multi-writearrayvalue-readnumber-bfed51": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "jsoncpp-multi-writeindent-decodenumber-dfc945": {
       "oracle": 1,
       "nop": 0,
       "ok": true

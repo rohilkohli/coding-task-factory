@@ -40,6 +40,7 @@ without human or LLM input:
 |---|---|---|
 | `bug-injection` | one realistic single-token defect inside a function (`<` → `<=`, `==` → `!=`, `&&` → `\|\|`, dropped `not`/`!`, `true` → `false`, off-by-one literal) | find and fix the regression; the failing tests are listed |
 | `function-removal` | a function body replaced by a "not implemented" stub; signature and docs kept (for C++, the docs come from the public header) | re-implement the function |
+| `multi-bug` | 2–3 individually validated defects in different functions, preferably different files | find and fix every defect; fixing only some still fails |
 
 Functions and mutation sites are found with each language's own parser.
 Python uses `ast`/`tokenize`, TypeScript uses the TypeScript compiler API, and
@@ -55,31 +56,67 @@ Every candidate passes the same gates as the hand-made tasks before it is kept:
    from the reference run time.
 2. **Fail-to-pass / pass-to-pass.** F2P and P2P lists come from two reference
    runs, which also detect flaky tests, plus the candidate run.
-3. **Adversarial strength.** Up to six plausible wrong fixes are graded: the
-   reference plus one other mutation in the same function, or another
-   "fix" at the injected site. If more than 25% of them would score 1, the
-   candidate is rejected as *weak-tests*.
+3. **Adversarial strength.** Up to six plausible wrong fixes are graded on top
+   of the reference: an operator mutation, a **statement deletion** (the
+   pseudo-testedness operator from the mutation-testing literature, which
+   works even on functions without operators), or another "fix" at the
+   injected site. Deletions that would only cause a compile or name error,
+   and deletions of assertions, are skipped, so the wrong fixes stay
+   plausible. A task needs **at least 3 wrong fixes** (*too-few-wrong-fixes*
+   otherwise). If more than 25% would score 1, it is rejected as
+   *weak-tests*. For `multi-bug`, **every partial fix** (some defects left in)
+   must also score 0 (*masked-bugs* otherwise).
 4. **Package.** The candidate becomes a complete Harbor task with a
    deterministic tar archive, the reference solution, F2P/P2P lists, the
-   instruction, a heuristic difficulty and full provenance in `task.toml`.
+   instruction, a static difficulty score and full provenance in `task.toml`.
+
+**Difficulty score.** This is a static, pre-run estimate. Published studies
+find that task difficulty is predicted mainly by patch fragmentation and patch
+size (see `docs/improvements-research.md`). Points are given for:
+
+- **Locations:** 2 locations give +2; 3 or more give +3.
+- **Files:** more than one file gives +1.
+- **Code to write:** function bodies give +1 to +3; multi-line fixes give +1.
+- **Failure signal:** 2 or fewer failing tests give +1 (harder to localise);
+  30 or more give −1, but only for single-location changes.
+
+A score of 0 or less is *easy*, 1–2 is *medium* and 3 or more is *hard*. Real
+agent runs will calibrate it later.
 
 Selection is seeded and spreads candidates across files. The same seed gives
 byte-identical tasks (`factory/repro_check.py`). `factory/harbor_check.py`
 runs Harbor's oracle and no-op agents over a generated set, and
 `factory/report.py` writes the funnel and diversity report.
 
-### First generated batch (seed 1), see `tasks/generated/REPORT.md`
+### Generated batch (seed 1), see `tasks/generated/REPORT.md`
 
-- **16 tasks accepted from 73 candidates.** Rejections: 17 had no way to
-  build wrong fixes, 15 had weak tests, 9 went undetected, 5 timed out
-  (hangs), 2 were too broad and 2 failed to build.
-- **3 languages:** Python 6, C++ 6, TypeScript 4. **2 kinds:** 8
-  bug-injection and 8 function-removal. **Coverage:** 11 source files, 16
-  distinct functions.
-- **All 16 pass `harbor lint`**, and Harbor's oracle (= 1) and no-op (= 0)
-  runs.
-- **Same seed gives byte-identical tasks.** `repro_check.py` confirmed this
-  for click bug-injection, jsoncpp function-removal and zod bug-injection.
+- **23 tasks accepted from 184 candidates.** This count includes the
+  single-bug pools that multi-bug tasks are composed from. Rejections: 36 had
+  too few wrong fixes, 34 went undetected, 32 had weak tests, 8 were too
+  broad, 6 failed to build and 5 timed out.
+- **3 languages:** Python 9, C++ 9, TypeScript 5.
+- **3 kinds:** 8 bug-injection, 8 function-removal and 7 multi-bug (two of
+  them have 3 defects).
+- **Coverage:** 16 source files and 32 distinct functions.
+- **Difficulty (static score):** 6 easy, 9 medium and 8 hard. The first batch
+  had no hard tasks.
+- **Partial fixes:** every multi-bug task rejects every partial fix. That is
+  2 partial fixes for 2-bug tasks and 6 for 3-bug tasks.
+- **Harbor checks:** all tasks pass `harbor lint`, and Harbor's oracle (= 1)
+  and no-op (= 0) runs.
+- **Reproducibility:** the same seed gives byte-identical tasks.
+  `repro_check.py` confirmed this for click bug-injection, click multi-bug,
+  jsoncpp function-removal and zod bug-injection.
+
+**Effect of the round-2 improvements**, compared with the first batch:
+
+- **Stricter bar, similar rejection rate.** With statement-deletion wrong
+  fixes, each task needs **at least 3 wrong fixes** (before, 1 was enough),
+  yet the rate of rejections for lack of wrong fixes stayed about the same:
+  17 of 73 (23%) before, 13 of 61 single-task candidates (21%) now.
+- **Stronger evidence.** Every accepted task is now checked against 3 to 12
+  wrong fixes; before, some were checked against only 1 or 2.
+- **Hard tasks.** Multi-bug tasks add a hard tier that did not exist before.
 
 Generated zod tasks are about 44 MB each because they vendor the Node
 toolchain twice. They are reproducible from the generator, so the repository

@@ -1,0 +1,22 @@
+--- a/packages/zod/src/v4/core/memoizer.ts
++++ b/packages/zod/src/v4/core/memoizer.ts
+@@ -67,7 +67,7 @@
+ 
+ // a fresh copy per hand-out, its path cut back to the recorded length; a live list hands out nothing, since its checks run again
+ function replay(rec: unknown[], into: errors.$ZodRawIssue[]): void {
+-  for (let i = 0; i < rec.length && typeof rec[i + 1] === "number"; i += 2) {
++  for (let i = 0; i < rec.length && typeof rec[i + 0] === "number"; i += 2) {
+     const iss = rec[i] as errors.$ZodRawIssue;
+     into.push(iss.path ? { ...iss, path: iss.path.slice(iss.path.length - (rec[i + 1] as number)) } : { ...iss });
+   }
+--- a/packages/zod/src/v4/core/to-json-schema.ts
++++ b/packages/zod/src/v4/core/to-json-schema.ts
+@@ -353,7 +353,7 @@
+     const defUriPrefix = `${uriPrefix}/${defsSegment}/`;
+ 
+     // an id-less root has nowhere to be extracted to, so it stays inline and self-references as `#`
+-    if (entry[1] === root && !entry[1].schema.id) {
++    if (entry[1] !== root && !entry[1].schema.id) {
+       return { ref: uriPrefix };
+     }
+ 

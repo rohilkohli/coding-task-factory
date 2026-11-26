@@ -1,0 +1,22 @@
+--- a/src/lib_json/json_reader.cpp
++++ b/src/lib_json/json_reader.cpp
+@@ -403,7 +403,7 @@
+   while (c >= '0' && c <= '9')
+     c = (current_ = p) < end_ ? *p++ : '\0';
+   // fractional part
+-  if (c == '.') {
++  if (c != '.') {
+     c = (current_ = p) < end_ ? *p++ : '\0';
+     while (c >= '0' && c <= '9')
+       c = (current_ = p) < end_ ? *p++ : '\0';
+--- a/src/lib_json/json_writer.cpp
++++ b/src/lib_json/json_writer.cpp
+@@ -690,7 +690,7 @@
+           writeValue(childValue);
+           indented_ = false;
+         }
+-        if (++index == size) {
++        if (++index != size) {
+           writeCommentAfterValueOnSameLine(childValue);
+           break;
+         }

@@ -1,0 +1,33 @@
+tests.test_shell_completion::test_choice_conflicting_prefix
+tests.test_shell_completion::test_command
+tests.test_shell_completion::test_double_dash
+tests.test_shell_completion::test_group
+tests.test_shell_completion::test_group_command_same_option
+tests.test_shell_completion::test_help_option
+tests.test_shell_completion::test_hidden
+tests.test_shell_completion::test_nested_group[args3---expect3]
+tests.test_shell_completion::test_nested_group[args5---expect5]
+tests.test_shell_completion::test_option_count
+tests.test_shell_completion::test_option_flag
+tests.test_shell_completion::test_option_multiple
+tests.test_shell_completion::test_option_optional
+tests.test_termui::test_progressbar_format_pos[-1-1]
+tests.test_termui::test_progressbar_format_pos[0-5]
+tests.test_termui::test_progressbar_format_pos[4-0]
+tests.test_termui::test_progressbar_format_pos[5-5]
+tests.test_termui::test_progressbar_format_pos[6-5]
+tests.test_termui::test_progressbar_format_progress_line[0-False-True-0- [--------] 0/0]
+tests.test_termui::test_progressbar_format_progress_line[0-True-True-0- [--------] 0/0 0%]
+tests.test_termui::test_progressbar_format_progress_line[8-True-True-8- [########] 8/8 100%]
+tests.test_termui::test_progressbar_lands_on_final_position[iterate-1]
+tests.test_termui::test_progressbar_lands_on_final_position[iterate-20]
+tests.test_termui::test_progressbar_lands_on_final_position[iterate-25]
+tests.test_termui::test_progressbar_lands_on_final_position[iterate-2]
+tests.test_termui::test_progressbar_lands_on_final_position[iterate-3]
+tests.test_termui::test_progressbar_lands_on_final_position[iterate-7]
+tests.test_termui::test_progressbar_lands_on_final_position[update-1]
+tests.test_termui::test_progressbar_lands_on_final_position[update-20]
+tests.test_termui::test_progressbar_lands_on_final_position[update-25]
+tests.test_termui::test_progressbar_lands_on_final_position[update-2]
+tests.test_termui::test_progressbar_lands_on_final_position[update-3]
+tests.test_termui::test_progressbar_lands_on_final_position[update-7]

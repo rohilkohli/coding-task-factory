@@ -20,10 +20,15 @@ line = 87
 change = "`is not` -> `is`"
 f2p_tests = 37
 p2p_tests = 2566
-adversarial_mutants = 4
-adversarial_killed = 4
+adversarial_mutants = 6
+adversarial_killed = 6
+partial_fixes_rejected = 0
 difficulty = "easy"
-difficulty_explanation = "Single-token defect (`is not` -> `is`) detected by 37 failing test(s); hint: failing tests only."
+difficulty_score = -1
+difficulty_explanation = "Static estimate (score -1): 1 change location(s) in 1 file(s), 1 line(s) to fix or write, 37 failing test(s) as signal."
+change_locations = 1
+change_files = 1
+change_lines = 1
 category = "bug-fix"
 
 [verifier]

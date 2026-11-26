@@ -1,0 +1,52 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/src" }]
+
+[task]
+name = "coding-task-factory/click-impl-group-group-277cba"
+version = "1.0.0"
+description = "Re-implement Group.group (src/click/core.py)"
+authors = []
+keywords = ["python", "click", "feature-implementation", "generated"]
+
+[metadata]
+generator = "function-removal"
+seed = 1
+source_repo = "https://github.com/pallets/click"
+source_commit = "08b803cf32ceb2ae6a772c62d5da42757a897d44"
+language = "python"
+file = "src/click/core.py"
+function = "Group.group"
+line = 1893
+change = "body removed (20 lines)"
+f2p_tests = 7
+p2p_tests = 2596
+adversarial_mutants = 6
+adversarial_killed = 5
+partial_fixes_rejected = 0
+difficulty = "medium"
+difficulty_score = 2
+difficulty_explanation = "Static estimate (score 2): 1 change location(s) in 1 file(s), 20 line(s) to fix or write, 7 failing test(s) as signal."
+change_locations = 1
+change_files = 1
+change_lines = 20
+category = "feature-implementation"
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048

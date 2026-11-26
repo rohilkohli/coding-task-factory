@@ -1,0 +1,21 @@
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -1267,17 +1267,7 @@
+         """Gets short help for the command or makes it by shortening the
+         long help string.
+         """
+-        if self.short_help:
+-            text = inspect.cleandoc(self.short_help)
+-        elif self.help:
+-            text = _make_default_short_help(self.help, limit)
+-        else:
+-            text = ""
+-
+-        if self.deprecated:
+-            text = f"{text} {_format_deprecated_label(self.deprecated)}"
+-
+-        return text.strip()
++        raise NotImplementedError("get_short_help_str is not implemented")
+ 
+     def format_help(self, ctx: Context, formatter: HelpFormatter) -> None:
+         """Writes the help into the formatter if it exists.

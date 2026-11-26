@@ -1,0 +1,107 @@
+{
+  "repo": "jsoncpp",
+  "strategy": "multi-bug",
+  "seed": 1,
+  "count_requested": 2,
+  "candidates_tried": 3,
+  "accepted": 2,
+  "funnel": {
+    "accepted": 2,
+    "surplus": 1
+  },
+  "reference": {
+    "tests": 340,
+    "stable_passing": 340,
+    "flaky": 0
+  },
+  "thresholds": {
+    "min_kill_rate": 0.75,
+    "max_f2p_fraction": 0.25,
+    "adversarial_per_task": 6,
+    "min_wrong_fixes": 3
+  },
+  "tasks": [
+    "jsoncpp-multi-writearrayvalue-readnumber-bfed51",
+    "jsoncpp-multi-writeindent-decodenumber-dfc945"
+  ],
+  "elapsed_sec": 581.6,
+  "candidates": [
+    {
+      "index": 1,
+      "id": "jsoncpp-multi-writearrayvalue-readnumber-bfed51",
+      "file": "src/lib_json/json_reader.cpp, src/lib_json/json_writer.cpp",
+      "function": "StyledStreamWriter::writeArrayValue, Reader::readNumber",
+      "line": 670,
+      "change": "StyledStreamWriter::writeArrayValue: `==` -> `!=`; Reader::readNumber: `==` -> `!=`",
+      "f2p": 78,
+      "p2p": 262,
+      "adversarial": {
+        "mutants": 8,
+        "killed": 7,
+        "kill_rate": 0.875,
+        "partial_fixes": 2,
+        "partial_killed": 2,
+        "survivors": [
+          "StyledStreamWriter::writeArrayValue: deleted `writeCommentAfterValueOnSameLine(childValue);`"
+        ]
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 2,
+      "id": "jsoncpp-multi-writeindent-decodenumber-dfc945",
+      "file": "src/lib_json/json_reader.cpp, src/lib_json/json_writer.cpp",
+      "function": "StyledWriter::writeIndent, Reader::decodeNumber",
+      "line": 529,
+      "change": "StyledWriter::writeIndent: `1` -> `2`; Reader::decodeNumber: `0` -> `1`",
+      "f2p": 85,
+      "p2p": 255,
+      "adversarial": {
+        "mutants": 8,
+        "killed": 7,
+        "kill_rate": 0.875,
+        "partial_fixes": 2,
+        "partial_killed": 2,
+        "survivors": [
+          "Reader::decodeNumber: 1 -> 2 @ offset 14646"
+        ]
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 3,
+      "id": "jsoncpp-multi-tohex16bit-operator-c8726a",
+      "file": "src/lib_json/json_value.cpp, src/lib_json/json_writer.cpp",
+      "function": "toHex16Bit, Value::operator==",
+      "line": 194,
+      "change": "toHex16Bit: `1` -> `2`; Value::operator==: `==` -> `!=`",
+      "f2p": 35,
+      "p2p": 305,
+      "adversarial": {
+        "mutants": 8,
+        "killed": 8,
+        "kill_rate": 1.0,
+        "partial_fixes": 2,
+        "partial_killed": 2,
+        "survivors": []
+      },
+      "status": "surplus",
+      "reason": "target count already reached"
+    }
+  ],
+  "bugs_per_task": 2,
+  "single_bug_stage": {
+    "candidates_tried": 33,
+    "validated_bugs": 6,
+    "funnel": {
+      "accepted": 6,
+      "rejected:build-failure": 2,
+      "rejected:hangs": 1,
+      "rejected:too-broad": 2,
+      "rejected:too-few-wrong-fixes": 7,
+      "rejected:undetected": 8,
+      "rejected:weak-tests": 6,
+      "surplus": 1
+    }
+  }
+}

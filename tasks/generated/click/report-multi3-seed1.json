@@ -1,0 +1,81 @@
+{
+  "repo": "click",
+  "strategy": "multi-bug",
+  "seed": 1,
+  "count_requested": 1,
+  "candidates_tried": 2,
+  "accepted": 1,
+  "funnel": {
+    "accepted": 1,
+    "surplus": 1
+  },
+  "reference": {
+    "tests": 2652,
+    "stable_passing": 2603,
+    "flaky": 0
+  },
+  "thresholds": {
+    "min_kill_rate": 0.75,
+    "max_f2p_fraction": 0.25,
+    "adversarial_per_task": 6,
+    "min_wrong_fixes": 3
+  },
+  "tasks": [
+    "click-multi-init-eta-format-message-dc9e6a"
+  ],
+  "elapsed_sec": 779.3,
+  "candidates": [
+    {
+      "index": 1,
+      "id": "click-multi-init-eta-format-message-dc9e6a",
+      "file": "src/click/_termui_impl.py, src/click/exceptions.py, src/click/formatting.py",
+      "function": "HelpFormatter.__init__, ProgressBar.eta, MissingParameter.format_message",
+      "line": 136,
+      "change": "HelpFormatter.__init__: `0` -> `1`; ProgressBar.eta: `-` -> `+`; MissingParameter.format_message: `is not` -> `is`",
+      "f2p": 46,
+      "p2p": 2557,
+      "adversarial": {
+        "mutants": 12,
+        "killed": 12,
+        "kill_rate": 1.0,
+        "partial_fixes": 6,
+        "partial_killed": 6,
+        "survivors": []
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 2,
+      "id": "click-multi-should-strip-ansi-fetch-process-args-for-o-e91ba3",
+      "file": "src/click/parser.py, src/click/testing.py",
+      "function": "CliRunner.isolation.<locals>.should_strip_ansi, _unpack_args.<locals>._fetch, _OptionParser._process_args_for_options",
+      "line": 535,
+      "change": "CliRunner.isolation.<locals>.should_strip_ansi: `is` -> `is not`; _unpack_args.<locals>._fetch: `is` -> `is not`; _OptionParser._process_args_for_options: `>` -> `<`",
+      "f2p": 464,
+      "p2p": 2139,
+      "adversarial": {
+        "mutants": 12,
+        "killed": 12,
+        "kill_rate": 1.0,
+        "partial_fixes": 6,
+        "partial_killed": 6,
+        "survivors": []
+      },
+      "status": "surplus",
+      "reason": "target count already reached"
+    }
+  ],
+  "bugs_per_task": 3,
+  "single_bug_stage": {
+    "candidates_tried": 12,
+    "validated_bugs": 6,
+    "funnel": {
+      "accepted": 6,
+      "rejected:hangs": 1,
+      "rejected:too-few-wrong-fixes": 1,
+      "rejected:undetected": 2,
+      "rejected:weak-tests": 1,
+      "surplus": 1
+    }
+  }
+}

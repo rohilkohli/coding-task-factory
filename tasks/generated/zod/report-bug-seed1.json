@@ -18,13 +18,14 @@
   "thresholds": {
     "min_kill_rate": 0.75,
     "max_f2p_fraction": 0.25,
-    "adversarial_per_task": 4
+    "adversarial_per_task": 4,
+    "min_wrong_fixes": 3
   },
   "tasks": [
     "zod-bug-foldobjects-ed4597",
     "zod-bug-helperfn-be74f3"
   ],
-  "elapsed_sec": 772.8,
+  "elapsed_sec": 409.8,
   "candidates": [
     {
       "index": 1,
@@ -39,8 +40,10 @@
         "mutants": 4,
         "killed": 3,
         "kill_rate": 0.75,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "1 -> 0 @ offset 22186"
+          "foldObjects: 1 -> 0 @ offset 22186"
         ]
       },
       "status": "accepted"
@@ -79,9 +82,11 @@
       "f2p": 5,
       "p2p": 5540,
       "adversarial": {
-        "mutants": 1,
-        "killed": 1,
+        "mutants": 3,
+        "killed": 3,
         "kill_rate": 1.0,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": []
       },
       "status": "accepted"
@@ -109,11 +114,11 @@
       "p2p": 5434,
       "adversarial": {
         "mutants": 4,
-        "killed": 3,
-        "kill_rate": 0.75,
-        "survivors": [
-          "?? -> || @ offset 8945"
-        ]
+        "killed": 4,
+        "kill_rate": 1.0,
+        "partial_fixes": 0,
+        "partial_killed": 0,
+        "survivors": []
       },
       "status": "surplus",
       "reason": "target count already reached"

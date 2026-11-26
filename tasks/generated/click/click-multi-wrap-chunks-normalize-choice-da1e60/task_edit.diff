@@ -1,0 +1,22 @@
+--- a/src/click/_textwrap.py
++++ b/src/click/_textwrap.py
+@@ -71,7 +71,7 @@
+                 del cur_line[-1]
+ 
+             if cur_line:
+-                lines.append(indent + "".join(cur_line))
++                lines.append(indent - "".join(cur_line))
+ 
+         return lines
+ 
+--- a/src/click/types.py
++++ b/src/click/types.py
+@@ -397,7 +397,7 @@
+         """
+         normed_value = choice.name if isinstance(choice, enum.Enum) else str(choice)
+ 
+-        if ctx is not None and ctx.token_normalize_func is not None:
++        if ctx is not None or ctx.token_normalize_func is not None:
+             normed_value = ctx.token_normalize_func(normed_value)
+ 
+         if not self.case_sensitive:

@@ -1,0 +1,22 @@
+--- a/src/lib_json/json_reader.cpp
++++ b/src/lib_json/json_reader.cpp
+@@ -536,7 +536,7 @@
+       isNegative ? Value::LargestUInt(Value::maxLargestInt) + 1
+                  : Value::maxLargestUInt;
+   Value::LargestUInt threshold = maxIntegerValue / 10;
+-  Value::LargestUInt value = 0;
++  Value::LargestUInt value = 1;
+   while (current < token.end_) {
+     Char c = *current++;
+     if (c < '0' || c > '9')
+--- a/src/lib_json/json_writer.cpp
++++ b/src/lib_json/json_writer.cpp
+@@ -528,7 +528,7 @@
+ 
+ void StyledWriter::writeIndent() {
+   if (!document_.empty()) {
+-    char last = document_[document_.length() - 1];
++    char last = document_[document_.length() - 2];
+     if (last == ' ') // already indented
+       return;
+     if (last != '\n') // Comments may add new-line

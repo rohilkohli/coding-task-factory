@@ -1,0 +1,52 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/packages/zod/src" }]
+
+[task]
+name = "coding-task-factory/zod-multi-makeuri-replay-4cae34"
+version = "1.0.0"
+description = "Fix 2 independent regressions in makeURI, replay"
+authors = []
+keywords = ["typescript", "zod", "bug-fix", "generated"]
+
+[metadata]
+generator = "multi-bug"
+seed = 1
+source_repo = "https://github.com/colinhacks/zod"
+source_commit = "d40c329910436e528d3c26cb1b9179e05abebf05"
+language = "typescript"
+file = "packages/zod/src/v4/core/memoizer.ts, packages/zod/src/v4/core/to-json-schema.ts"
+function = "makeURI, replay"
+line = 332
+change = "makeURI: `===` -> `!==`; replay: `1` -> `0`"
+f2p_tests = 190
+p2p_tests = 5355
+adversarial_mutants = 6
+adversarial_killed = 5
+partial_fixes_rejected = 2
+difficulty = "hard"
+difficulty_score = 3
+difficulty_explanation = "Static estimate (score 3): 2 change location(s) in 2 file(s), 2 line(s) to fix or write, 190 failing test(s) as signal."
+change_locations = 2
+change_files = 2
+change_lines = 2
+category = "bug-fix"
+
+[verifier]
+timeout_sec = 900.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096

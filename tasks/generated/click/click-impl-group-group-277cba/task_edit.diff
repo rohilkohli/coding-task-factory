@@ -1,0 +1,36 @@
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -1907,32 +1907,7 @@
+         .. versionchanged:: 8.0
+             Added the :attr:`group_class` attribute.
+         """
+-        from .decorators import group
+-
+-        func: t.Callable[..., t.Any] | None = None
+-
+-        if args and callable(args[0]):
+-            assert len(args) == 1 and not kwargs, (
+-                "Use 'group(**kwargs)(callable)' to provide arguments."
+-            )
+-            (func,) = args
+-            args = ()
+-
+-        if self.group_class is not None and kwargs.get("cls") is None:
+-            if self.group_class is type:
+-                kwargs["cls"] = type(self)
+-            else:
+-                kwargs["cls"] = self.group_class
+-
+-        def decorator(f: t.Callable[..., t.Any]) -> Group:
+-            cmd: Group = group(*args, **kwargs)(f)
+-            self.add_command(cmd)
+-            return cmd
+-
+-        if func is not None:
+-            return decorator(func)
+-
+-        return decorator
++        raise NotImplementedError("group is not implemented")
+ 
+     def result_callback(self, replace: bool = False) -> t.Callable[[F], F]:
+         """Adds a result callback to the command.  By default if a

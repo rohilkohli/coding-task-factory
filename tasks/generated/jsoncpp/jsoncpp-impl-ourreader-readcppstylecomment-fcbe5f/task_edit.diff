@@ -1,0 +1,31 @@
+--- a/src/lib_json/json_reader.cpp
++++ b/src/lib_json/json_reader.cpp
+@@ -5,6 +5,7 @@
+ // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
+ 
+ #if !defined(JSON_IS_AMALGAMATION)
++#include <stdexcept>
+ #include "json_tool.h"
+ #include <json/assertions.h>
+ #include <json/reader.h>
+@@ -1404,19 +1405,7 @@
+ }
+ 
+ bool OurReader::readCppStyleComment() {
+-  while (current_ != end_) {
+-    Char c = getNextChar();
+-    if (c == '\n')
+-      break;
+-    if (c == '\r') {
+-      // Consume DOS EOL. It will be normalized in addComment.
+-      if (current_ != end_ && *current_ == '\n')
+-        getNextChar();
+-      // Break on Moc OS 9 EOL.
+-      break;
+-    }
+-  }
+-  return true;
++  throw std::logic_error("not implemented");
+ }
+ 
+ bool OurReader::readNumber(bool checkInf) {

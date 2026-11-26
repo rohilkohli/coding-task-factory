@@ -1,0 +1,33 @@
+--- a/src/lib_json/json_reader.cpp
++++ b/src/lib_json/json_reader.cpp
+@@ -509,7 +509,7 @@
+     if (currentToken.type_ == tokenArrayEnd)
+       break;
+   }
+-  return true;
++  return false;
+ }
+ 
+ bool Reader::decodeNumber(Token& token) {
+--- a/src/lib_json/json_value.cpp
++++ b/src/lib_json/json_value.cpp
+@@ -884,7 +884,7 @@
+ bool Value::isConvertibleTo(ValueType other) const {
+   switch (other) {
+   case nullValue:
+-    return (isNumeric() && asDouble() == 0.0) ||
++    return (isNumeric() || asDouble() == 0.0) ||
+            (type() == booleanValue && !value_.bool_) ||
+            (type() == stringValue && asString().empty()) ||
+            (type() == arrayValue && value_.map_->empty()) ||
+--- a/src/lib_json/json_writer.cpp
++++ b/src/lib_json/json_writer.cpp
+@@ -765,7 +765,7 @@
+ void StyledStreamWriter::indent() { indentString_ += indentation_; }
+ 
+ void StyledStreamWriter::unindent() {
+-  assert(indentString_.size() >= indentation_.size());
++  assert(indentString_.size() <= indentation_.size());
+   indentString_.resize(indentString_.size() - indentation_.size());
+ }
+ 

@@ -70,6 +70,30 @@ function collectSites(body, sf) {
   return sites;
 }
 
+// Statements whose deletion is a plausible wrong fix (declarations and returns
+// are skipped: deleting them mostly yields type errors, a trivial "wrong fix").
+function collectDeletions(body, sf) {
+  const out = [];
+  const visit = (node) => {
+    if (node !== body && ts.isFunctionLike(node)) return;
+    if (ts.isExpressionStatement(node) || ts.isIfStatement(node) || ts.isThrowStatement(node) ||
+        ts.isForStatement(node) || ts.isForOfStatement(node) || ts.isForInStatement(node) ||
+        ts.isWhileStatement(node)) {
+      const start = node.getStart(sf);
+      const lines = sf.getLineAndCharacterOfPosition(node.getEnd()).line -
+        sf.getLineAndCharacterOfPosition(start).line;
+      const parentIsElse = ts.isIfStatement(node.parent) && node.parent.elseStatement === node;
+      const isAssertion = ts.isExpressionStatement(node) && /^(console\.)?assert\w*\(/.test(node.getText(sf));
+      if (lines <= 8 && !parentIsElse && !isAssertion) {
+        out.push({ kind: "stmt", text: node.getText(sf), start, end: node.getEnd() });
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(body);
+  return out;
+}
+
 const out = [];
 for (const file of files) {
   const text = fs.readFileSync(file, "utf8");
@@ -90,6 +114,7 @@ for (const file of files) {
           line: sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1,
           doc: docs.join("\n"),
           sites: collectSites(node.body, sf),
+          deletions: collectDeletions(node.body, sf),
         });
       }
     }

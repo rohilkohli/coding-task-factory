@@ -7,6 +7,10 @@
 * Mutation sites inside each function body (operators, negations, boolean and
   integer literals) are reported with exact offsets, so a mutation never
   touches strings or comments.
+* Statement-deletion sites (`Function.deletions`) are whole statements whose
+  removal is a plausible wrong fix (Python: replaced by `pass`; TypeScript and
+  C++: removed). Declarations and other deletions that would only produce a
+  compile/name error are skipped, since such "wrong fixes" are trivially caught.
 * mutations_for(site) lists the replacement texts for a site.
 * removal_stub(lang, fn, text) returns the file text with the function body
   replaced by a "not implemented" stub (signature and docs kept).
@@ -28,7 +32,7 @@ FACTORY = Path(__file__).resolve().parent
 
 @dataclass
 class Site:
-    kind: str  # op | not | bool | int
+    kind: str  # op | not | bool | int | stmt (delete) | stmt-py (replace with `pass`)
     text: str
     start: int  # char offset in file text
     end: int
@@ -44,10 +48,7 @@ class Function:
     body_end: int  # offset where it ends (exclusive)
     doc: str = ""
     sites: list[Site] = field(default_factory=list)
-
-    @property
-    def body_lines(self) -> int:
-        return 0  # filled by caller with the text if needed
+    deletions: list[Site] = field(default_factory=list)
 
 
 # --------------------------------------------------------------------------
@@ -73,6 +74,10 @@ def mutations_for(site: Site) -> list[str]:
     if site.kind == "int":
         n = int(site.text)
         return [str(n + 1)] + ([str(n - 1)] if n > 0 else [])
+    if site.kind == "stmt-py":
+        return ["pass"]
+    if site.kind == "stmt":
+        return [""]
     return []
 
 
@@ -135,7 +140,39 @@ def _python_functions(root: Path, rel: str) -> list[Function]:
             sites.append(Site("int", tok.string, s, e))
 
     out: list[Function] = []
-    class_stack: list[str] = []
+
+    def binds_local(stmt) -> bool:
+        targets = stmt.targets if isinstance(stmt, ast.Assign) else [stmt.target]
+        for t in targets:
+            if isinstance(t, ast.Name) or (isinstance(t, (ast.Tuple, ast.List)) and
+                                           any(isinstance(e, ast.Name) for e in t.elts)):
+                return True
+        return False
+
+    def deletable(stmts) -> list[Site]:
+        found = []
+        for st in stmts:
+            if isinstance(st, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Pass, ast.Global,
+                               ast.Nonlocal, ast.Import, ast.ImportFrom, ast.Assert)):
+                continue
+            ok = True
+            if isinstance(st, (ast.Assign, ast.AnnAssign)) and binds_local(st):
+                ok = False  # deleting a local binding only causes a NameError
+            if isinstance(st, ast.Expr) and isinstance(st.value, ast.Constant):
+                ok = False
+            if st.end_lineno - st.lineno > 8:
+                ok = False
+            if ok:
+                start, end = to_off(st.lineno, st.col_offset), to_off(st.end_lineno, st.end_col_offset)
+                if not text[start:end].startswith(("elif", "else")):
+                    found.append(Site("stmt-py", text[start:end], start, end))
+            for field_name in ("body", "orelse", "finalbody"):
+                inner = getattr(st, field_name, None)
+                if isinstance(inner, list) and inner and isinstance(inner[0], ast.stmt):
+                    found += deletable(inner)
+            for handler in getattr(st, "handlers", []) or []:
+                found += deletable(handler.body)
+        return found
 
     def visit(node, prefix=""):
         for child in ast.iter_child_nodes(node):
@@ -152,6 +189,7 @@ def _python_functions(root: Path, rel: str) -> list[Function]:
                 fn = Function(rel, prefix + child.name, child.lineno, to_off(child.lineno, child.col_offset),
                               b_start, b_end, doc)
                 fn.sites = [st for st in sites if b_start <= st.start and st.end <= b_end]
+                fn.deletions = deletable(stmts)
                 out.append(fn)
                 visit(child, f"{prefix}{child.name}.<locals>.")
     visit(tree)
@@ -264,8 +302,42 @@ def _cpp_functions(root: Path, rel: str) -> list[Function]:
                     fn = Function(rel, b["name"], text.count("\n", 0, def_start) + 1, def_start, b["at"] + 1, i,
                                   _cpp_doc(text, def_start))
                     fn.sites = _cpp_sites(text, code, b["at"] + 1, i)
+                    fn.deletions = _cpp_deletions(text, code, b["at"] + 1, i)
                     out.append(fn)
             seg_start = i + 1
+    return out
+
+
+_CPP_DECL = re.compile(r"^(const\s+|static\s+|auto\s+|unsigned\s+|signed\s+)*[A-Za-z_][\w:<>,]*[\s*&]+"
+                       r"[A-Za-z_]\w*\s*(=|;|\(|\{|\[)")
+_CPP_EXPR_STMT = re.compile(
+    r"^(\*?[\w.\->:\[\]()]+\s*(=|\+=|-=|\*=|/=|\|=|&=|<<=|>>=)[^=]"  # assignment to an existing lvalue
+    r"|(\+\+|--)?[\w.\->:\[\]]+(\+\+|--)\s*;"  # increment / decrement
+    r"|[\w.\->:]+(\s*<[^;]*>)?\s*\(.*\)\s*;"  # call statement
+    r"|throw\b)")
+# keywords whose statements are not deletion candidates, plus assertions: deleting a
+# check does not change normal behaviour, so it would be an unfair "wrong fix"
+_CPP_KEYWORDS = ("return", "break", "continue", "goto", "case", "default", "delete", "else", "do",
+                 "assert", "JSON_ASSERT", "JSON_FAIL", "static_assert")
+
+
+def _cpp_deletions(text: str, code: str, start: int, end: int) -> list[Site]:
+    """Single-line expression statements (assignments, calls, increments, throws)."""
+    out = []
+    prev_end_char = "{"
+    pos = start
+    for line in code[start:end].split("\n"):
+        stripped = line.strip()
+        line_start = pos + (len(line) - len(line.lstrip()))
+        pos += len(line) + 1
+        if not stripped:
+            continue
+        if (stripped.endswith(";") and "{" not in stripped and "}" not in stripped
+                and prev_end_char in ";{}:" and not stripped.startswith(_CPP_KEYWORDS)
+                and not _CPP_DECL.match(stripped) and _CPP_EXPR_STMT.match(stripped)):
+            s_end = line_start + len(stripped)
+            out.append(Site("stmt", text[line_start:s_end], line_start, s_end))
+        prev_end_char = stripped[-1]
     return out
 
 
@@ -322,6 +394,8 @@ def _ts_functions(root: Path, rels: list[str], ts_module: Path) -> list[Function
         # JS offsets are UTF-16 units; keep only sites whose text matches here
         fn.sites = [Site(s["kind"], s["text"], s["start"], s["end"]) for s in item["sites"]
                     if text[s["start"]:s["end"]] == s["text"]]
+        fn.deletions = [Site("stmt", s["text"], s["start"], s["end"]) for s in item.get("deletions", [])
+                        if text[s["start"]:s["end"]] == s["text"]]
         if text[fn.body_start - 1:fn.body_start] == "{" and text[fn.body_end:fn.body_end + 1] == "}":
             out.append(fn)
     return out

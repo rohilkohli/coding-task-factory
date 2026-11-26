@@ -1,0 +1,30 @@
+tests.test_basic::test_basic_group
+tests.test_basic::test_summary_line
+tests.test_chain::test_chaining_help[args0-COMMAND1 [ARGS]... [COMMAND2 [ARGS]...]...]
+tests.test_chain::test_chaining_help[args1-ROOT HELP]
+tests.test_commands::test_auto_shorthelp
+tests.test_commands::test_deprecated_help_text_is_not_translated
+tests.test_commands::test_group_with_args[args1-0-Show this message and exit.]
+tests.test_commands::test_group_with_args[args3-2-Show this message and exit.]
+tests.test_commands::test_subcommand_metavar_marks_optional[False-False-COMMAND [ARGS]...]
+tests.test_commands::test_subcommand_metavar_marks_optional[False-True-[COMMAND] [ARGS]...]
+tests.test_commands::test_subcommand_metavar_marks_optional[True-False-COMMAND1 [ARGS]... [COMMAND2 [ARGS]...]...]
+tests.test_commands::test_subcommand_metavar_marks_optional[True-True-[COMMAND1] [ARGS]... [COMMAND2 [ARGS]...]...]
+tests.test_shell_completion::test_add_different_name
+tests.test_shell_completion::test_chained
+tests.test_shell_completion::test_full_complete[bash-env0-plain,a\nplain,b\n]
+tests.test_shell_completion::test_full_complete[bash-env1-plain,b\n]
+tests.test_shell_completion::test_full_complete[fish-env4-plain,a\nplain,b\tbee\n]
+tests.test_shell_completion::test_full_complete[fish-env5-plain,b\tbee\n]
+tests.test_shell_completion::test_full_complete[fish-env6-plain,b\tbee\n]
+tests.test_shell_completion::test_full_complete[powershell-env7-plain\na\n_\nplain\nb\nbee\n]
+tests.test_shell_completion::test_full_complete[powershell-env8-plain\nb\nbee\n]
+tests.test_shell_completion::test_full_complete[zsh-env2-plain\na\n_\nplain\nb\nbee\n]
+tests.test_shell_completion::test_full_complete[zsh-env3-plain\nb\nbee\n]
+tests.test_shell_completion::test_group
+tests.test_shell_completion::test_nested_group[args0--expect0]
+tests.test_shell_completion::test_nested_group[args1--expect1]
+tests.test_shell_completion::test_nested_group[args2--expect2]
+tests.test_shell_completion::test_zsh_full_complete_with_colons[env0-plain\na\n_\nplain\nb\nbee\nplain\nc\\:d\ncee:dee\nplain\nc:e\n_\n]
+tests.test_shell_completion::test_zsh_full_complete_with_colons[env1-plain\nc\\:d\ncee:dee\nplain\nc:e\n_\n]
+tests.test_shell_completion::test_zsh_full_complete_with_colons[env2-plain\nc\\:d\ncee:dee\nplain\nc:e\n_\n]

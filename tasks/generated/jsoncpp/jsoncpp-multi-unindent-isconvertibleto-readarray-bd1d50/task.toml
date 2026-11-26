@@ -1,0 +1,52 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/src/lib_json" }, { source = "/app/include" }]
+
+[task]
+name = "coding-task-factory/jsoncpp-multi-unindent-isconvertibleto-readarray-bd1d50"
+version = "1.0.0"
+description = "Fix 3 independent regressions in StyledStreamWriter::unindent, Value::isConvertibleTo, Reader::readArray"
+authors = []
+keywords = ["cpp", "jsoncpp", "bug-fix", "generated"]
+
+[metadata]
+generator = "multi-bug"
+seed = 1
+source_repo = "https://github.com/open-source-parsers/jsoncpp"
+source_commit = "93acc7b155048f1a66c43235cc205519f1e7a6ea"
+language = "cpp"
+file = "src/lib_json/json_reader.cpp, src/lib_json/json_value.cpp, src/lib_json/json_writer.cpp"
+function = "StyledStreamWriter::unindent, Value::isConvertibleTo, Reader::readArray"
+line = 767
+change = "StyledStreamWriter::unindent: `>=` -> `<=`; Value::isConvertibleTo: `&&` -> `||`; Reader::readArray: `true` -> `false`"
+f2p_tests = 44
+p2p_tests = 296
+adversarial_mutants = 12
+adversarial_killed = 12
+partial_fixes_rejected = 6
+difficulty = "hard"
+difficulty_score = 5
+difficulty_explanation = "Static estimate (score 5): 3 change location(s) in 3 file(s), 3 line(s) to fix or write, 44 failing test(s) as signal."
+change_locations = 3
+change_files = 3
+change_lines = 3
+category = "bug-fix"
+
+[verifier]
+timeout_sec = 900.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096

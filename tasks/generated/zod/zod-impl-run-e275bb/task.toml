@@ -20,10 +20,15 @@ line = 42
 change = "body removed (13 lines)"
 f2p_tests = 57
 p2p_tests = 5488
-adversarial_mutants = 3
-adversarial_killed = 3
+adversarial_mutants = 4
+adversarial_killed = 4
+partial_fixes_rejected = 0
 difficulty = "medium"
-difficulty_explanation = "Re-implement a 13-line function body from its signature, docs and call sites."
+difficulty_score = 1
+difficulty_explanation = "Static estimate (score 1): 1 change location(s) in 1 file(s), 13 line(s) to fix or write, 57 failing test(s) as signal."
+change_locations = 1
+change_files = 1
+change_lines = 13
 category = "feature-implementation"
 
 [verifier]

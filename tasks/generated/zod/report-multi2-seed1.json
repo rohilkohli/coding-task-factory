@@ -1,0 +1,81 @@
+{
+  "repo": "zod",
+  "strategy": "multi-bug",
+  "seed": 1,
+  "count_requested": 1,
+  "candidates_tried": 2,
+  "accepted": 1,
+  "funnel": {
+    "accepted": 1,
+    "surplus": 1
+  },
+  "reference": {
+    "tests": 5545,
+    "stable_passing": 5545,
+    "flaky": 0
+  },
+  "thresholds": {
+    "min_kill_rate": 0.75,
+    "max_f2p_fraction": 0.25,
+    "adversarial_per_task": 4,
+    "min_wrong_fixes": 3
+  },
+  "tasks": [
+    "zod-multi-makeuri-replay-4cae34"
+  ],
+  "elapsed_sec": 1831.1,
+  "candidates": [
+    {
+      "index": 1,
+      "id": "zod-multi-makeuri-replay-4cae34",
+      "file": "packages/zod/src/v4/core/memoizer.ts, packages/zod/src/v4/core/to-json-schema.ts",
+      "function": "makeURI, replay",
+      "line": 332,
+      "change": "makeURI: `===` -> `!==`; replay: `1` -> `0`",
+      "f2p": 190,
+      "p2p": 5355,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 5,
+        "kill_rate": 0.833,
+        "partial_fixes": 2,
+        "partial_killed": 2,
+        "survivors": [
+          "makeURI: deleted `entry[1].defId = id;`"
+        ]
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 2,
+      "id": "zod-multi-initializer-objectprocessor-734699",
+      "file": "packages/zod/src/v4/classic/errors.ts, packages/zod/src/v4/core/json-schema-processors.ts",
+      "function": "initializer, objectProcessor",
+      "line": 50,
+      "change": "initializer: `false` -> `true`; objectProcessor: `>` -> `>=`",
+      "f2p": 4,
+      "p2p": 5541,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 6,
+        "kill_rate": 1.0,
+        "partial_fixes": 2,
+        "partial_killed": 2,
+        "survivors": []
+      },
+      "status": "surplus",
+      "reason": "target count already reached"
+    }
+  ],
+  "bugs_per_task": 2,
+  "single_bug_stage": {
+    "candidates_tried": 13,
+    "validated_bugs": 4,
+    "funnel": {
+      "accepted": 4,
+      "rejected:too-few-wrong-fixes": 3,
+      "rejected:undetected": 5,
+      "surplus": 1
+    }
+  }
+}

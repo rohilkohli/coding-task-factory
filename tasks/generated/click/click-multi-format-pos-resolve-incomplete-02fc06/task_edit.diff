@@ -1,0 +1,22 @@
+--- a/src/click/_termui_impl.py
++++ b/src/click/_termui_impl.py
+@@ -194,7 +194,7 @@
+ 
+     def format_pos(self) -> str:
+         pos = str(self.pos)
+-        if self.length is not None:
++        if self.length is None:
+             pos += f"/{self.length}"
+         return pos
+ 
+--- a/src/click/shell_completion.py
++++ b/src/click/shell_completion.py
+@@ -766,7 +766,7 @@
+     # split and discard the "=" to make completion easier.
+     if incomplete == "=":
+         incomplete = ""
+-    elif "=" in incomplete and _start_of_option(ctx, incomplete):
++    elif "=" in incomplete or _start_of_option(ctx, incomplete):
+         name, _, incomplete = incomplete.partition("=")
+         args.append(name)
+ 

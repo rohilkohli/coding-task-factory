@@ -7,8 +7,8 @@
   "accepted": 2,
   "funnel": {
     "accepted": 2,
-    "rejected:no-adversarial-sites": 7,
     "rejected:too-broad": 1,
+    "rejected:too-few-wrong-fixes": 7,
     "rejected:weak-tests": 5
   },
   "reference": {
@@ -19,13 +19,14 @@
   "thresholds": {
     "min_kill_rate": 0.75,
     "max_f2p_fraction": 0.25,
-    "adversarial_per_task": 4
+    "adversarial_per_task": 4,
+    "min_wrong_fixes": 3
   },
   "tasks": [
     "zod-impl-ownpaths-c21831",
     "zod-impl-run-e275bb"
   ],
-  "elapsed_sec": 1339.7,
+  "elapsed_sec": 813.1,
   "candidates": [
     {
       "index": 1,
@@ -37,7 +38,7 @@
       "f2p": 2,
       "p2p": 5543,
       "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "reason": "too-few-wrong-fixes"
     },
     {
       "index": 2,
@@ -49,7 +50,7 @@
       "f2p": 12,
       "p2p": 5533,
       "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "reason": "too-few-wrong-fixes"
     },
     {
       "index": 3,
@@ -60,16 +61,8 @@
       "change": "body removed (7 lines)",
       "f2p": 453,
       "p2p": 5092,
-      "adversarial": {
-        "mutants": 1,
-        "killed": 0,
-        "kill_rate": 0.0,
-        "survivors": [
-          "?? -> || @ offset 1314"
-        ]
-      },
       "status": "rejected",
-      "reason": "weak-tests"
+      "reason": "too-few-wrong-fixes"
     },
     {
       "index": 4,
@@ -81,11 +74,13 @@
       "f2p": 342,
       "p2p": 5203,
       "adversarial": {
-        "mutants": 1,
-        "killed": 0,
-        "kill_rate": 0.0,
+        "mutants": 3,
+        "killed": 2,
+        "kill_rate": 0.667,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "?? -> || @ offset 2009"
+          "get: ?? -> || @ offset 2009"
         ]
       },
       "status": "rejected",
@@ -101,12 +96,14 @@
       "f2p": 3,
       "p2p": 5542,
       "adversarial": {
-        "mutants": 3,
-        "killed": 1,
-        "kill_rate": 0.333,
+        "mutants": 4,
+        "killed": 2,
+        "kill_rate": 0.5,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "?? -> || @ offset 571",
-          "true -> false @ offset 604"
+          "withChecks: ?? -> || @ offset 571",
+          "withChecks: true -> false @ offset 604"
         ]
       },
       "status": "rejected",
@@ -121,8 +118,20 @@
       "change": "body removed (26 lines)",
       "f2p": 3,
       "p2p": 5542,
+      "adversarial": {
+        "mutants": 4,
+        "killed": 1,
+        "kill_rate": 0.25,
+        "partial_fixes": 0,
+        "partial_killed": 0,
+        "survivors": [
+          "generateNumberFormatCheck: deleted `void (format satisfies never);`",
+          "generateNumberFormatCheck: deleted `doc.write(`if (!Number.isInteger(${accessor}) || ${accessor}`",
+          "generateNumberFormatCheck: deleted `doc.write(`"
+        ]
+      },
       "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "reason": "weak-tests"
     },
     {
       "index": 7,
@@ -149,9 +158,11 @@
         "mutants": 4,
         "killed": 2,
         "kill_rate": 0.5,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "false -> true @ offset 80815",
-          "- -> + @ offset 80990"
+          "sameIssue: false -> true @ offset 80815",
+          "sameIssue: deleted `if (!Array.isArray(y) || x.length !== y.length) return false`"
         ]
       },
       "status": "rejected",
@@ -167,7 +178,7 @@
       "f2p": 9,
       "p2p": 5536,
       "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "reason": "too-few-wrong-fixes"
     },
     {
       "index": 10,
@@ -179,9 +190,11 @@
       "f2p": 21,
       "p2p": 5524,
       "adversarial": {
-        "mutants": 2,
-        "killed": 2,
+        "mutants": 4,
+        "killed": 4,
         "kill_rate": 1.0,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": []
       },
       "status": "accepted"
@@ -196,7 +209,7 @@
       "f2p": 15,
       "p2p": 5530,
       "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "reason": "too-few-wrong-fixes"
     },
     {
       "index": 12,
@@ -208,7 +221,7 @@
       "f2p": 18,
       "p2p": 5527,
       "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "reason": "too-few-wrong-fixes"
     },
     {
       "index": 13,
@@ -220,9 +233,11 @@
       "f2p": 57,
       "p2p": 5488,
       "adversarial": {
-        "mutants": 3,
-        "killed": 3,
+        "mutants": 4,
+        "killed": 4,
         "kill_rate": 1.0,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": []
       },
       "status": "accepted"
@@ -237,7 +252,7 @@
       "f2p": 5,
       "p2p": 5540,
       "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "reason": "too-few-wrong-fixes"
     },
     {
       "index": 15,
@@ -252,9 +267,11 @@
         "mutants": 4,
         "killed": 2,
         "kill_rate": 0.5,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "|| -> && @ offset 3900",
-          "!== -> === @ offset 3484"
+          "resolveRef: || -> && @ offset 3900",
+          "resolveRef: deleted `if (pointer !== \"\" && !pointer.startsWith(\"/\")) {`"
         ]
       },
       "status": "rejected",

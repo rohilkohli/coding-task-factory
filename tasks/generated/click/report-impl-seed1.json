@@ -3,14 +3,14 @@
   "strategy": "function-removal",
   "seed": 1,
   "count_requested": 3,
-  "candidates_tried": 21,
+  "candidates_tried": 14,
   "accepted": 3,
   "funnel": {
     "accepted": 3,
-    "rejected:hangs": 4,
-    "rejected:no-adversarial-sites": 6,
+    "rejected:hangs": 3,
     "rejected:too-broad": 1,
-    "rejected:weak-tests": 6,
+    "rejected:too-few-wrong-fixes": 2,
+    "rejected:weak-tests": 4,
     "surplus": 1
   },
   "reference": {
@@ -21,14 +21,15 @@
   "thresholds": {
     "min_kill_rate": 0.75,
     "max_f2p_fraction": 0.25,
-    "adversarial_per_task": 6
+    "adversarial_per_task": 6,
+    "min_wrong_fixes": 3
   },
   "tasks": [
-    "click-impl-nosuchoption-format-message-b25755",
-    "click-impl-optionparser-match-long-opt-c4815f",
-    "click-impl-build-prompt-c47ac0"
+    "click-impl-command-get-short-help-str-c209c9",
+    "click-impl-group-group-277cba",
+    "click-impl-zshcomplete-get-completion-args-c2d85a"
   ],
-  "elapsed_sec": 336.8,
+  "elapsed_sec": 1.5,
   "candidates": [
     {
       "index": 1,
@@ -39,8 +40,15 @@
       "change": "body removed (9 lines)",
       "f2p": 30,
       "p2p": 2573,
-      "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "adversarial": {
+        "mutants": 3,
+        "killed": 3,
+        "kill_rate": 1.0,
+        "partial_fixes": 0,
+        "partial_killed": 0,
+        "survivors": []
+      },
+      "status": "accepted"
     },
     {
       "index": 2,
@@ -55,10 +63,12 @@
         "mutants": 6,
         "killed": 3,
         "kill_rate": 0.5,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "is -> is not @ offset 16332",
-          "is not -> is @ offset 16686",
-          "True -> False @ offset 19062"
+          "version_option: is -> is not @ offset 16332",
+          "version_option: deleted `if package_name:`",
+          "version_option: deleted `if package_name == \"__main__\":`"
         ]
       },
       "status": "rejected",
@@ -74,13 +84,16 @@
       "f2p": 1,
       "p2p": 2602,
       "adversarial": {
-        "mutants": 3,
-        "killed": 0,
-        "kill_rate": 0.0,
+        "mutants": 6,
+        "killed": 2,
+        "kill_rate": 0.333,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "0 -> 1 @ offset 3111",
-          "> -> >= @ offset 3109",
-          "> -> < @ offset 3109"
+          "TextWrapper.indent_only: 0 -> 1 @ offset 3111",
+          "TextWrapper.indent_only: deleted `if idx > 0:`",
+          "TextWrapper.indent_only: > -> >= @ offset 3109",
+          "TextWrapper.indent_only: > -> < @ offset 3109"
         ]
       },
       "status": "rejected",
@@ -127,13 +140,16 @@
       "p2p": 2577,
       "adversarial": {
         "mutants": 6,
-        "killed": 2,
-        "kill_rate": 0.333,
+        "killed": 1,
+        "kill_rate": 0.167,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "1 -> 2 @ offset 4932",
-          "1 -> 2 @ offset 4938",
-          "1 -> 0 @ offset 4932",
-          "1 -> 0 @ offset 4938"
+          "ProgressBar.pct: 1 -> 2 @ offset 4932",
+          "ProgressBar.pct: 1 -> 2 @ offset 4938",
+          "ProgressBar.pct: deleted `if self.finished:`",
+          "ProgressBar.pct: 1 -> 0 @ offset 4932",
+          "ProgressBar.pct: deleted `return 1.0`"
         ]
       },
       "status": "rejected",
@@ -150,15 +166,15 @@
       "p2p": 2596,
       "adversarial": {
         "mutants": 6,
-        "killed": 4,
-        "kill_rate": 0.667,
+        "killed": 5,
+        "kill_rate": 0.833,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "and -> or @ offset 73150",
-          "and -> or @ offset 72956"
+          "Group.group: and -> or @ offset 73150"
         ]
       },
-      "status": "rejected",
-      "reason": "weak-tests"
+      "status": "accepted"
     },
     {
       "index": 9,
@@ -170,7 +186,7 @@
       "f2p": 2,
       "p2p": 2601,
       "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "reason": "too-few-wrong-fixes"
     },
     {
       "index": 10,
@@ -181,12 +197,25 @@
       "change": "body removed (9 lines)",
       "f2p": 152,
       "p2p": 2451,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 2,
+        "kill_rate": 0.333,
+        "partial_fixes": 0,
+        "partial_killed": 0,
+        "survivors": [
+          "TextWrapper.extra_indent: deleted `self.initial_indent = old_initial_indent`",
+          "TextWrapper.extra_indent: deleted `self.initial_indent += indent`",
+          "TextWrapper.extra_indent: deleted `self.subsequent_indent += indent`",
+          "TextWrapper.extra_indent: deleted `self.subsequent_indent = old_subsequent_indent`"
+        ]
+      },
       "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "reason": "weak-tests"
     },
     {
       "index": 11,
-      "id": "click-impl-clirunner-isolation-locals-should-strip--bc4e45",
+      "id": "click-impl-clirunner-isolation-locals-should-strip-bc4e45",
       "file": "src/click/testing.py",
       "function": "CliRunner.isolation.<locals>.should_strip_ansi",
       "line": 535,
@@ -206,7 +235,7 @@
       "f2p": 1,
       "p2p": 2602,
       "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "reason": "too-few-wrong-fixes"
     },
     {
       "index": 13,
@@ -218,15 +247,16 @@
       "f2p": 5,
       "p2p": 2598,
       "adversarial": {
-        "mutants": 2,
-        "killed": 1,
-        "kill_rate": 0.5,
+        "mutants": 4,
+        "killed": 3,
+        "kill_rate": 0.75,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "1 -> 2 @ offset 14352"
+          "ZshComplete.get_completion_args: 1 -> 2 @ offset 14352"
         ]
       },
-      "status": "rejected",
-      "reason": "weak-tests"
+      "status": "accepted"
     },
     {
       "index": 14,
@@ -238,121 +268,15 @@
       "f2p": 5,
       "p2p": 2598,
       "adversarial": {
-        "mutants": 1,
-        "killed": 1,
-        "kill_rate": 1.0,
-        "survivors": []
-      },
-      "status": "accepted"
-    },
-    {
-      "index": 15,
-      "id": "click-impl-optionparser-match-long-opt-c4815f",
-      "file": "src/click/parser.py",
-      "function": "_OptionParser._match_long_opt",
-      "line": 363,
-      "change": "body removed (14 lines)",
-      "f2p": 458,
-      "p2p": 2145,
-      "adversarial": {
         "mutants": 4,
         "killed": 4,
         "kill_rate": 1.0,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": []
-      },
-      "status": "accepted"
-    },
-    {
-      "index": 16,
-      "id": "click-impl-build-prompt-c47ac0",
-      "file": "src/click/termui.py",
-      "function": "_build_prompt",
-      "line": 108,
-      "change": "body removed (10 lines)",
-      "f2p": 117,
-      "p2p": 2486,
-      "adversarial": {
-        "mutants": 4,
-        "killed": 4,
-        "kill_rate": 1.0,
-        "survivors": []
-      },
-      "status": "accepted"
-    },
-    {
-      "index": 17,
-      "id": "click-impl-format-filename-d1e48d",
-      "file": "src/click/utils.py",
-      "function": "format_filename",
-      "line": 426,
-      "change": "body removed (11 lines)",
-      "f2p": 14,
-      "p2p": 2589,
-      "status": "rejected",
-      "reason": "no-adversarial-sites"
-    },
-    {
-      "index": 18,
-      "id": "click-impl-progressbar-format-progress-line-773b18",
-      "file": "src/click/_termui_impl.py",
-      "function": "ProgressBar.format_progress_line",
-      "line": 223,
-      "change": "body removed (22 lines)",
-      "f2p": 24,
-      "p2p": 2579,
-      "adversarial": {
-        "mutants": 6,
-        "killed": 5,
-        "kill_rate": 0.833,
-        "survivors": [
-          "and -> or @ offset 7242"
-        ]
       },
       "status": "surplus",
       "reason": "target count already reached"
-    },
-    {
-      "index": 19,
-      "id": "click-impl-helpformatter-indentation-786033",
-      "file": "src/click/formatting.py",
-      "function": "HelpFormatter.indentation",
-      "line": 298,
-      "change": "body removed (5 lines)",
-      "f2p": 21,
-      "p2p": 2582,
-      "status": "rejected",
-      "reason": "no-adversarial-sites"
-    },
-    {
-      "index": 20,
-      "id": "click-impl-command-a69026",
-      "file": "src/click/decorators.py",
-      "function": "command",
-      "line": 164,
-      "change": "body removed (38 lines)",
-      "status": "rejected",
-      "reason": "hangs"
-    },
-    {
-      "index": 21,
-      "id": "click-impl-textwrapper-wrap-chunks-01b81f",
-      "file": "src/click/_textwrap.py",
-      "function": "TextWrapper._wrap_chunks",
-      "line": 20,
-      "change": "body removed (28 lines)",
-      "f2p": 274,
-      "p2p": 2329,
-      "adversarial": {
-        "mutants": 6,
-        "killed": 4,
-        "kill_rate": 0.667,
-        "survivors": [
-          "0 -> 1 @ offset 1427",
-          "> -> >= @ offset 2199"
-        ]
-      },
-      "status": "rejected",
-      "reason": "weak-tests"
     }
   ]
 }

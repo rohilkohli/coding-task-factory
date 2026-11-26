@@ -1,0 +1,52 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/src" }]
+
+[task]
+name = "coding-task-factory/click-multi-format-pos-resolve-incomplete-02fc06"
+version = "1.0.0"
+description = "Fix 2 independent regressions in ProgressBar.format_pos, _resolve_incomplete"
+authors = []
+keywords = ["python", "click", "bug-fix", "generated"]
+
+[metadata]
+generator = "multi-bug"
+seed = 1
+source_repo = "https://github.com/pallets/click"
+source_commit = "08b803cf32ceb2ae6a772c62d5da42757a897d44"
+language = "python"
+file = "src/click/_termui_impl.py, src/click/shell_completion.py"
+function = "ProgressBar.format_pos, _resolve_incomplete"
+line = 195
+change = "ProgressBar.format_pos: `is not` -> `is`; _resolve_incomplete: `and` -> `or`"
+f2p_tests = 33
+p2p_tests = 2570
+adversarial_mutants = 8
+adversarial_killed = 6
+partial_fixes_rejected = 2
+difficulty = "hard"
+difficulty_score = 3
+difficulty_explanation = "Static estimate (score 3): 2 change location(s) in 2 file(s), 2 line(s) to fix or write, 33 failing test(s) as signal."
+change_locations = 2
+change_files = 2
+change_lines = 2
+category = "bug-fix"
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048

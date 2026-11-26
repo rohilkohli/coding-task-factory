@@ -1,6 +1,6 @@
 {
-  "tasks": 4,
-  "passed": 4,
+  "tasks": 5,
+  "passed": 5,
   "results": {
     "zod-bug-foldobjects-ed4597": {
       "oracle": 1,
@@ -18,6 +18,11 @@
       "ok": true
     },
     "zod-impl-run-e275bb": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "zod-multi-makeuri-replay-4cae34": {
       "oracle": 1,
       "nop": 0,
       "ok": true

@@ -1,0 +1,33 @@
+--- a/src/click/_termui_impl.py
++++ b/src/click/_termui_impl.py
+@@ -168,7 +168,7 @@
+     @property
+     def eta(self) -> float:
+         if self.length is not None and not self.finished:
+-            return self.time_per_iteration * (self.length - self.pos)
++            return self.time_per_iteration * (self.length + self.pos)
+         return 0.0
+ 
+     def format_eta(self) -> str:
+--- a/src/click/exceptions.py
++++ b/src/click/exceptions.py
+@@ -193,7 +193,7 @@
+         param_hint = f" {param_hint}" if param_hint else ""
+ 
+         param_type = self.param_type
+-        if param_type is None and self.param is not None:
++        if param_type is None and self.param is None:
+             param_type = self.param.param_type_name
+ 
+         msg = self.message
+--- a/src/click/formatting.py
++++ b/src/click/formatting.py
+@@ -149,7 +149,7 @@
+             if width is None:
+                 width = max(min(shutil.get_terminal_size().columns, max_width) - 2, 50)
+         self.width = width
+-        self.current_indent = 0
++        self.current_indent = 1
+         self.buffer = []
+ 
+     def write(self, string: str) -> None:

@@ -1,0 +1,104 @@
+{
+  "repo": "click",
+  "strategy": "multi-bug",
+  "seed": 1,
+  "count_requested": 2,
+  "candidates_tried": 3,
+  "accepted": 2,
+  "funnel": {
+    "accepted": 2,
+    "surplus": 1
+  },
+  "reference": {
+    "tests": 2652,
+    "stable_passing": 2603,
+    "flaky": 0
+  },
+  "thresholds": {
+    "min_kill_rate": 0.75,
+    "max_f2p_fraction": 0.25,
+    "adversarial_per_task": 6,
+    "min_wrong_fixes": 3
+  },
+  "tasks": [
+    "click-multi-wrap-chunks-normalize-choice-da1e60",
+    "click-multi-format-pos-resolve-incomplete-02fc06"
+  ],
+  "elapsed_sec": 1.0,
+  "candidates": [
+    {
+      "index": 1,
+      "id": "click-multi-wrap-chunks-normalize-choice-da1e60",
+      "file": "src/click/_textwrap.py, src/click/types.py",
+      "function": "TextWrapper._wrap_chunks, Choice.normalize_choice",
+      "line": 20,
+      "change": "TextWrapper._wrap_chunks: `+` -> `-`; Choice.normalize_choice: `and` -> `or`",
+      "f2p": 290,
+      "p2p": 2313,
+      "adversarial": {
+        "mutants": 8,
+        "killed": 8,
+        "kill_rate": 1.0,
+        "partial_fixes": 2,
+        "partial_killed": 2,
+        "survivors": []
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 2,
+      "id": "click-multi-format-pos-resolve-incomplete-02fc06",
+      "file": "src/click/_termui_impl.py, src/click/shell_completion.py",
+      "function": "ProgressBar.format_pos, _resolve_incomplete",
+      "line": 195,
+      "change": "ProgressBar.format_pos: `is not` -> `is`; _resolve_incomplete: `and` -> `or`",
+      "f2p": 33,
+      "p2p": 2570,
+      "adversarial": {
+        "mutants": 8,
+        "killed": 6,
+        "kill_rate": 0.75,
+        "partial_fixes": 2,
+        "partial_killed": 2,
+        "survivors": [
+          "_resolve_incomplete: deleted `args.append(name)`",
+          "_resolve_incomplete: deleted `if incomplete == \"=\":`"
+        ]
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 3,
+      "id": "click-multi-resolve-pager-comm-init-960e32",
+      "file": "src/click/_termui_impl.py, src/click/exceptions.py",
+      "function": "_resolve_pager_command, NoSuchCommand.__init__",
+      "line": 423,
+      "change": "_resolve_pager_command: `0` -> `1`; NoSuchCommand.__init__: `is` -> `is not`",
+      "f2p": 61,
+      "p2p": 2542,
+      "adversarial": {
+        "mutants": 8,
+        "killed": 7,
+        "kill_rate": 0.875,
+        "partial_fixes": 2,
+        "partial_killed": 2,
+        "survivors": [
+          "NoSuchCommand.__init__: deleted `self.command_name = command_name`"
+        ]
+      },
+      "status": "surplus",
+      "reason": "target count already reached"
+    }
+  ],
+  "bugs_per_task": 2,
+  "single_bug_stage": {
+    "candidates_tried": 13,
+    "validated_bugs": 6,
+    "funnel": {
+      "accepted": 6,
+      "rejected:too-few-wrong-fixes": 1,
+      "rejected:undetected": 5,
+      "rejected:weak-tests": 1
+    }
+  }
+}

@@ -3,15 +3,14 @@
   "strategy": "bug-injection",
   "seed": 1,
   "count_requested": 3,
-  "candidates_tried": 12,
+  "candidates_tried": 13,
   "accepted": 3,
   "funnel": {
     "accepted": 3,
     "rejected:build-failure": 2,
-    "rejected:no-adversarial-sites": 2,
+    "rejected:too-few-wrong-fixes": 3,
     "rejected:undetected": 3,
-    "rejected:weak-tests": 1,
-    "surplus": 1
+    "rejected:weak-tests": 2
   },
   "reference": {
     "tests": 340,
@@ -21,14 +20,15 @@
   "thresholds": {
     "min_kill_rate": 0.75,
     "max_f2p_fraction": 0.25,
-    "adversarial_per_task": 6
+    "adversarial_per_task": 6,
+    "min_wrong_fixes": 3
   },
   "tasks": [
-    "jsoncpp-bug-ourreader-decodestring-06c621",
     "jsoncpp-bug-fastwriter-writevalue-be51db",
-    "jsoncpp-bug-value-czstring-operator-95f29e"
+    "jsoncpp-bug-value-czstring-operator-95f29e",
+    "jsoncpp-bug-ourreader-getlocationlineandcolumn-e0d025"
   ],
-  "elapsed_sec": 292.2,
+  "elapsed_sec": 38.9,
   "candidates": [
     {
       "index": 1,
@@ -52,7 +52,7 @@
       "f2p": 14,
       "p2p": 326,
       "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "reason": "too-few-wrong-fixes"
     },
     {
       "index": 3,
@@ -64,12 +64,18 @@
       "f2p": 5,
       "p2p": 335,
       "adversarial": {
-        "mutants": 4,
+        "mutants": 6,
         "killed": 4,
-        "kill_rate": 1.0,
-        "survivors": []
+        "kill_rate": 0.667,
+        "partial_fixes": 0,
+        "partial_killed": 0,
+        "survivors": [
+          "OurReader::decodeString: deleted `currentValue().setOffsetLimit(token.end_ - begin_);`",
+          "OurReader::decodeString: deleted `currentValue().setOffsetStart(token.start_ - begin_);`"
+        ]
       },
-      "status": "accepted"
+      "status": "rejected",
+      "reason": "weak-tests"
     },
     {
       "index": 4,
@@ -106,6 +112,8 @@
         "mutants": 6,
         "killed": 6,
         "kill_rate": 1.0,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": []
       },
       "status": "accepted"
@@ -123,8 +131,10 @@
         "mutants": 6,
         "killed": 5,
         "kill_rate": 0.833,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "&& -> || @ offset 12678"
+          "Value::CZString::operator==: && -> || @ offset 12678"
         ]
       },
       "status": "accepted"
@@ -151,7 +161,7 @@
       "f2p": 41,
       "p2p": 299,
       "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "reason": "too-few-wrong-fixes"
     },
     {
       "index": 10,
@@ -176,9 +186,11 @@
         "mutants": 6,
         "killed": 4,
         "kill_rate": 0.667,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "<= -> < @ offset 45444",
-          "&& -> || @ offset 45428"
+          "Value::isIntegral: <= -> < @ offset 45444",
+          "Value::isIntegral: && -> || @ offset 45428"
         ]
       },
       "status": "rejected",
@@ -195,14 +207,25 @@
       "p2p": 339,
       "adversarial": {
         "mutants": 6,
-        "killed": 5,
-        "kill_rate": 0.833,
-        "survivors": [
-          "!= -> == @ offset 55017"
-        ]
+        "killed": 6,
+        "kill_rate": 1.0,
+        "partial_fixes": 0,
+        "partial_killed": 0,
+        "survivors": []
       },
-      "status": "surplus",
-      "reason": "target count already reached"
+      "status": "accepted"
+    },
+    {
+      "index": 13,
+      "id": "jsoncpp-bug-styledstreamwriter-writecommentaftervalu-bc102a",
+      "file": "src/lib_json/json_writer.cpp",
+      "function": "StyledStreamWriter::writeCommentAfterValueOnSameLine",
+      "line": 790,
+      "change": "`false` -> `true`",
+      "f2p": 7,
+      "p2p": 333,
+      "status": "rejected",
+      "reason": "too-few-wrong-fixes"
     }
   ]
 }

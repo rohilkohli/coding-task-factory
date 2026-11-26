@@ -3,13 +3,13 @@
   "strategy": "function-removal",
   "seed": 1,
   "count_requested": 3,
-  "candidates_tried": 8,
+  "candidates_tried": 9,
   "accepted": 3,
   "funnel": {
     "accepted": 3,
-    "rejected:no-adversarial-sites": 1,
-    "rejected:weak-tests": 2,
-    "surplus": 2
+    "rejected:too-few-wrong-fixes": 1,
+    "rejected:weak-tests": 4,
+    "surplus": 1
   },
   "reference": {
     "tests": 340,
@@ -19,14 +19,15 @@
   "thresholds": {
     "min_kill_rate": 0.75,
     "max_f2p_fraction": 0.25,
-    "adversarial_per_task": 6
+    "adversarial_per_task": 6,
+    "min_wrong_fixes": 3
   },
   "tasks": [
     "jsoncpp-impl-path-resolve-087a97",
-    "jsoncpp-impl-styledstreamwriter-ismultilinearray-fef4cc",
-    "jsoncpp-impl-builtstyledstreamwriter-writewithindent-46b8db"
+    "jsoncpp-impl-builtstyledstreamwriter-writewithindent-46b8db",
+    "jsoncpp-impl-ourreader-readcppstylecomment-fcbe5f"
   ],
-  "elapsed_sec": 320.2,
+  "elapsed_sec": 0.6,
   "candidates": [
     {
       "index": 1,
@@ -38,7 +39,7 @@
       "f2p": 64,
       "p2p": 276,
       "status": "rejected",
-      "reason": "no-adversarial-sites"
+      "reason": "too-few-wrong-fixes"
     },
     {
       "index": 2,
@@ -53,6 +54,8 @@
         "mutants": 6,
         "killed": 6,
         "kill_rate": 1.0,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": []
       },
       "status": "accepted"
@@ -68,13 +71,17 @@
       "p2p": 326,
       "adversarial": {
         "mutants": 6,
-        "killed": 5,
-        "kill_rate": 0.833,
+        "killed": 4,
+        "kill_rate": 0.667,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "< -> <= @ offset 21089"
+          "StyledStreamWriter::isMultilineArray: < -> <= @ offset 21089",
+          "StyledStreamWriter::isMultilineArray: deleted `childValues_.reserve(size);`"
         ]
       },
-      "status": "accepted"
+      "status": "rejected",
+      "reason": "weak-tests"
     },
     {
       "index": 4,
@@ -89,10 +96,12 @@
         "mutants": 6,
         "killed": 3,
         "kill_rate": 0.5,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "!= -> == @ offset 9222",
-          "== -> != @ offset 9241",
-          "&& -> || @ offset 9229"
+          "Reader::normalizeEOL: deleted `normalized += '\\n';`",
+          "Reader::normalizeEOL: != -> == @ offset 9222",
+          "Reader::normalizeEOL: deleted `normalized.reserve(static_cast<size_t>(end - begin));`"
         ]
       },
       "status": "rejected",
@@ -111,10 +120,12 @@
         "mutants": 6,
         "killed": 3,
         "kill_rate": 0.5,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          ">= -> <= @ offset 45418",
-          "<= -> < @ offset 45444",
-          "<= -> >= @ offset 45444"
+          "Value::isIntegral: >= -> <= @ offset 45418",
+          "Value::isIntegral: <= -> < @ offset 45444",
+          "Value::isIntegral: <= -> >= @ offset 45444"
         ]
       },
       "status": "rejected",
@@ -130,9 +141,11 @@
       "f2p": 28,
       "p2p": 312,
       "adversarial": {
-        "mutants": 2,
-        "killed": 2,
+        "mutants": 3,
+        "killed": 3,
         "kill_rate": 1.0,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": []
       },
       "status": "accepted"
@@ -150,12 +163,13 @@
         "mutants": 6,
         "killed": 5,
         "kill_rate": 0.833,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": [
-          "!= -> == @ offset 40413"
+          "OurReader::readCppStyleComment: != -> == @ offset 40413"
         ]
       },
-      "status": "surplus",
-      "reason": "target count already reached"
+      "status": "accepted"
     },
     {
       "index": 8,
@@ -167,13 +181,38 @@
       "f2p": 76,
       "p2p": 264,
       "adversarial": {
-        "mutants": 2,
-        "killed": 2,
+        "mutants": 6,
+        "killed": 6,
         "kill_rate": 1.0,
+        "partial_fixes": 0,
+        "partial_killed": 0,
         "survivors": []
       },
       "status": "surplus",
       "reason": "target count already reached"
+    },
+    {
+      "index": 9,
+      "id": "jsoncpp-impl-reader-decodestring-718877",
+      "file": "src/lib_json/json_reader.cpp",
+      "function": "Reader::decodeString",
+      "line": 612,
+      "change": "body removed (52 lines)",
+      "f2p": 83,
+      "p2p": 257,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 4,
+        "kill_rate": 0.667,
+        "partial_fixes": 0,
+        "partial_killed": 0,
+        "survivors": [
+          "Reader::decodeString: 1 -> 0 @ offset 18817",
+          "Reader::decodeString: deleted `decoded += '\\b';`"
+        ]
+      },
+      "status": "rejected",
+      "reason": "weak-tests"
     }
   ]
 }

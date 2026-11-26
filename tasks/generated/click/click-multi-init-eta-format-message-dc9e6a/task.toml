@@ -1,0 +1,52 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/src" }]
+
+[task]
+name = "coding-task-factory/click-multi-init-eta-format-message-dc9e6a"
+version = "1.0.0"
+description = "Fix 3 independent regressions in HelpFormatter.__init__, ProgressBar.eta, MissingParameter.format_message"
+authors = []
+keywords = ["python", "click", "bug-fix", "generated"]
+
+[metadata]
+generator = "multi-bug"
+seed = 1
+source_repo = "https://github.com/pallets/click"
+source_commit = "08b803cf32ceb2ae6a772c62d5da42757a897d44"
+language = "python"
+file = "src/click/_termui_impl.py, src/click/exceptions.py, src/click/formatting.py"
+function = "HelpFormatter.__init__, ProgressBar.eta, MissingParameter.format_message"
+line = 136
+change = "HelpFormatter.__init__: `0` -> `1`; ProgressBar.eta: `-` -> `+`; MissingParameter.format_message: `is not` -> `is`"
+f2p_tests = 46
+p2p_tests = 2557
+adversarial_mutants = 12
+adversarial_killed = 12
+partial_fixes_rejected = 6
+difficulty = "hard"
+difficulty_score = 5
+difficulty_explanation = "Static estimate (score 5): 3 change location(s) in 3 file(s), 3 line(s) to fix or write, 46 failing test(s) as signal."
+change_locations = 3
+change_files = 3
+change_lines = 3
+category = "bug-fix"
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048

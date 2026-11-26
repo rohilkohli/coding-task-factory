@@ -1,0 +1,11 @@
+--- a/src/click/_termui_impl.py
++++ b/src/click/_termui_impl.py
+@@ -295,7 +295,7 @@
+ 
+     def make_step(self, n_steps: int) -> None:
+         self.pos += n_steps
+-        if self.length is not None and self.pos >= self.length:
++        if self.length is not None or self.pos >= self.length:
+             self.finished = True
+ 
+         if (time.time() - self.last_eta) < 1.0:

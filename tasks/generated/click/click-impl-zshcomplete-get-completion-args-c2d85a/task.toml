@@ -1,0 +1,52 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/src" }]
+
+[task]
+name = "coding-task-factory/click-impl-zshcomplete-get-completion-args-c2d85a"
+version = "1.0.0"
+description = "Re-implement ZshComplete.get_completion_args (src/click/shell_completion.py)"
+authors = []
+keywords = ["python", "click", "feature-implementation", "generated"]
+
+[metadata]
+generator = "function-removal"
+seed = 1
+source_repo = "https://github.com/pallets/click"
+source_commit = "08b803cf32ceb2ae6a772c62d5da42757a897d44"
+language = "python"
+file = "src/click/shell_completion.py"
+function = "ZshComplete.get_completion_args"
+line = 453
+change = "body removed (8 lines)"
+f2p_tests = 5
+p2p_tests = 2598
+adversarial_mutants = 4
+adversarial_killed = 3
+partial_fixes_rejected = 0
+difficulty = "medium"
+difficulty_score = 1
+difficulty_explanation = "Static estimate (score 1): 1 change location(s) in 1 file(s), 8 line(s) to fix or write, 5 failing test(s) as signal."
+change_locations = 1
+change_files = 1
+change_lines = 8
+category = "feature-implementation"
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048

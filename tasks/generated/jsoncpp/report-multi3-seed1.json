@@ -1,0 +1,84 @@
+{
+  "repo": "jsoncpp",
+  "strategy": "multi-bug",
+  "seed": 1,
+  "count_requested": 1,
+  "candidates_tried": 2,
+  "accepted": 1,
+  "funnel": {
+    "accepted": 1,
+    "surplus": 1
+  },
+  "reference": {
+    "tests": 340,
+    "stable_passing": 340,
+    "flaky": 0
+  },
+  "thresholds": {
+    "min_kill_rate": 0.75,
+    "max_f2p_fraction": 0.25,
+    "adversarial_per_task": 6,
+    "min_wrong_fixes": 3
+  },
+  "tasks": [
+    "jsoncpp-multi-unindent-isconvertibleto-readarray-bd1d50"
+  ],
+  "elapsed_sec": 571.9,
+  "candidates": [
+    {
+      "index": 1,
+      "id": "jsoncpp-multi-unindent-isconvertibleto-readarray-bd1d50",
+      "file": "src/lib_json/json_reader.cpp, src/lib_json/json_value.cpp, src/lib_json/json_writer.cpp",
+      "function": "StyledStreamWriter::unindent, Value::isConvertibleTo, Reader::readArray",
+      "line": 767,
+      "change": "StyledStreamWriter::unindent: `>=` -> `<=`; Value::isConvertibleTo: `&&` -> `||`; Reader::readArray: `true` -> `false`",
+      "f2p": 44,
+      "p2p": 296,
+      "adversarial": {
+        "mutants": 12,
+        "killed": 12,
+        "kill_rate": 1.0,
+        "partial_fixes": 6,
+        "partial_killed": 6,
+        "survivors": []
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 2,
+      "id": "jsoncpp-multi-removemember-writearrayvalue-isint-0bd93c",
+      "file": "src/lib_json/json_value.cpp, src/lib_json/json_writer.cpp",
+      "function": "Value::removeMember, StyledWriter::writeArrayValue, Value::isInt",
+      "line": 1302,
+      "change": "Value::removeMember: `==` -> `!=`; StyledWriter::writeArrayValue: `==` -> `!=`; Value::isInt: `&&` -> `||`",
+      "f2p": 12,
+      "p2p": 328,
+      "adversarial": {
+        "mutants": 12,
+        "killed": 11,
+        "kill_rate": 0.917,
+        "partial_fixes": 6,
+        "partial_killed": 6,
+        "survivors": [
+          "StyledWriter::writeArrayValue: deleted `writeCommentAfterValueOnSameLine(childValue);`"
+        ]
+      },
+      "status": "surplus",
+      "reason": "target count already reached"
+    }
+  ],
+  "bugs_per_task": 3,
+  "single_bug_stage": {
+    "candidates_tried": 42,
+    "validated_bugs": 6,
+    "funnel": {
+      "accepted": 6,
+      "rejected:build-failure": 2,
+      "rejected:too-broad": 4,
+      "rejected:too-few-wrong-fixes": 11,
+      "rejected:undetected": 7,
+      "rejected:weak-tests": 10,
+      "surplus": 2
+    }
+  }
+}
