@@ -1,0 +1,13 @@
+--- a/src/click/exceptions.py
++++ b/src/click/exceptions.py
+@@ -260,9 +260,7 @@
+         self.possibilities = possibilities_
+ 
+     def format_message(self) -> str:
+-        if not self.possibilities:
+-            return self.message
+-        return f"{self.message} {_format_possibilities(self.possibilities)}"
++        raise NotImplementedError("format_message is not implemented")
+ 
+ 
+ class NoSuchCommand(UsageError):

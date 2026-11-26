@@ -1,0 +1,309 @@
+diff --git a/packages/zod/src/v4/classic/from-json-schema.ts b/packages/zod/src/v4/classic/from-json-schema.ts
+index 195113a..1a7c15b 100644
+--- a/packages/zod/src/v4/classic/from-json-schema.ts
++++ b/packages/zod/src/v4/classic/from-json-schema.ts
+@@ -543,8 +543,6 @@ function convertBaseSchema(schema: JSONSchema.JSONSchema, ctx: ConversionContext
+           stringSchema = stringSchema.check(z.e164());
+         } else if (format === "credit_card") {
+           stringSchema = stringSchema.check(z.creditCard());
+-        } else if (format === "iban") {
+-          stringSchema = stringSchema.check(z.iban());
+         } else if (format === "jwt") {
+           stringSchema = stringSchema.check(z.jwt());
+         } else if (format === "emoji") {
+diff --git a/packages/zod/src/v4/classic/schemas.ts b/packages/zod/src/v4/classic/schemas.ts
+index 9e989a6..480bb10 100644
+--- a/packages/zod/src/v4/classic/schemas.ts
++++ b/packages/zod/src/v4/classic/schemas.ts
+@@ -1031,19 +1031,6 @@ export function creditCard(params?: string | core.$ZodCreditCardParams): ZodCred
+   return core._creditCard(ZodCreditCard, params);
+ }
+ 
+-// ZodIBAN
+-export interface ZodIBAN extends ZodStringFormat<"iban"> {
+-  _zod: core.$ZodIBANInternals;
+-}
+-export const ZodIBAN: core.$constructor<ZodIBAN> = /*@__PURE__*/ core.$constructor("ZodIBAN", (inst, def) => {
+-  core.$ZodIBAN.init(inst, def);
+-  ZodStringFormat.init(inst, def);
+-});
+-
+-export function iban(params?: string | core.$ZodIBANParams): ZodIBAN {
+-  return core._iban(ZodIBAN, params);
+-}
+-
+ // ZodJWT
+ export interface ZodJWT extends ZodStringFormat<"jwt"> {
+   _zod: core.$ZodJWTInternals;
+diff --git a/packages/zod/src/v4/classic/tests/iban.test.ts b/packages/zod/src/v4/classic/tests/iban.test.ts
+deleted file mode 100644
+index c2ec741..0000000
+--- a/packages/zod/src/v4/classic/tests/iban.test.ts
++++ /dev/null
+@@ -1,81 +0,0 @@
+-import { describe, expect, test } from "vitest";
+-import * as z from "zod";
+-
+-describe("z.iban", () => {
+-  const valid: [string, string][] = [
+-    ["Norway (15, minimum)", "NO9386011117947"],
+-    ["Belgium (16)", "BE68539007547034"],
+-    ["Netherlands (18)", "NL91ABNA0417164300"],
+-    ["Germany (22)", "DE89370400440532013000"],
+-    ["Great Britain (22)", "GB29NWBK60161331926819"],
+-    ["Turkey (26)", "TR610000100000000000000001"],
+-    ["France (27)", "FR1420041010050500013M02606"],
+-    ["Cyprus (28)", "CY17002001280000001200527600"],
+-    ["Malta (31)", "MT84MALT011000012345MTLCAST001S"],
+-    ["Maximum length (34)", "AA73AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"],
+-    ["Maximum length mixed (34)", "ZZ560123456789ABCDEFGHIJKLMNOPQRST"],
+-  ];
+-
+-  test.each(valid)("accepts %s", (_label, n) => {
+-    expect(z.iban().parse(n)).toBe(n);
+-  });
+-
+-  test("rejects lowercase characters", () => {
+-    expect(() => z.iban().parse("no9386011117947")).toThrow();
+-    expect(() => z.iban().parse("de89370400440532013000")).toThrow();
+-    expect(() => z.iban().parse("FR1420041010050500013m02606")).toThrow();
+-  });
+-
+-  test("rejects spaces and hyphens", () => {
+-    expect(() => z.iban().parse("NO93 8601 1117 947")).toThrow();
+-    expect(() => z.iban().parse(" DE89370400440532013000")).toThrow();
+-    expect(() => z.iban().parse("DE89370400440532013000 ")).toThrow();
+-    expect(() => z.iban().parse("NO93-8601-1117-947")).toThrow();
+-    expect(() => z.iban().parse("DE89-3704-0044-0532-0130-00")).toThrow();
+-  });
+-
+-  test("rejects special characters", () => {
+-    expect(() => z.iban().parse("NO938601111794!")).toThrow();
+-    expect(() => z.iban().parse("DE8937040044053201300@")).toThrow();
+-    expect(() => z.iban().parse("")).toThrow();
+-  });
+-
+-  test("rejects inputs outside length bounds (15-34)", () => {
+-    expect(() => z.iban().parse("NO938601111794")).toThrow();
+-    expect(() => z.iban().parse("AA73AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")).toThrow();
+-  });
+-
+-  test("rejects invalid check digits (checksum failure)", () => {
+-    expect(() => z.iban().parse("NO9386011117948")).toThrow();
+-    expect(() => z.iban().parse("DE89370400440532013001")).toThrow();
+-    expect(() => z.iban().parse("FR1420041010050500013M02607")).toThrow();
+-  });
+-
+-  test("rejects check digits outside 02-98", () => {
+-    // mod 97 alone accepts all three; `98 - remainder` can only ever emit 02-98
+-    expect(() => z.iban().parse("DE00000000000000000066")).toThrow();
+-    expect(() => z.iban().parse("DE01000000000000000048")).toThrow();
+-    expect(() => z.iban().parse("DE99000000000000000030")).toThrow();
+-  });
+-
+-  test("carries the shape regex as its JSON Schema pattern", () => {
+-    expect(z.toJSONSchema(z.iban())).toMatchObject({
+-      format: "iban",
+-      pattern: z.regexes.iban.source,
+-    });
+-  });
+-
+-  test("round-trips through JSON Schema with the checksum intact", () => {
+-    const schema = z.fromJSONSchema(z.toJSONSchema(z.iban()));
+-    expect(schema.safeParse("DE89370400440532013000").success).toBe(true);
+-    expect(schema.safeParse("DE89370400440532013001").success).toBe(false);
+-  });
+-
+-  test("error message references IBAN", () => {
+-    const result = z.iban().safeParse("not-an-iban");
+-    expect(result.success).toBe(false);
+-    if (!result.success) {
+-      expect(result.error.issues[0]?.message).toMatch(/IBAN/i);
+-    }
+-  });
+-});
+diff --git a/packages/zod/src/v4/core/api.ts b/packages/zod/src/v4/core/api.ts
+index 962a04b..0790491 100644
+--- a/packages/zod/src/v4/core/api.ts
++++ b/packages/zod/src/v4/core/api.ts
+@@ -498,23 +498,6 @@ export function _creditCard<T extends schemas.$ZodCreditCard>(
+   });
+ }
+ 
+-// IBAN
+-export type $ZodIBANParams = StringFormatParams<schemas.$ZodIBAN, "pattern" | "when">;
+-export type $ZodCheckIBANParams = CheckStringFormatParams<schemas.$ZodIBAN, "pattern" | "when">;
+-// @__NO_SIDE_EFFECTS__
+-export function _iban<T extends schemas.$ZodIBAN>(
+-  Class: util.SchemaClass<T>,
+-  params?: string | $ZodIBANParams | $ZodCheckIBANParams
+-): T {
+-  return new Class({
+-    type: "string",
+-    format: "iban",
+-    check: "string_format",
+-    abort: false,
+-    ...util.normalizeParams(params),
+-  });
+-}
+-
+ // JWT
+ export type $ZodJWTParams = StringFormatParams<schemas.$ZodJWT, "pattern" | "when">;
+ export type $ZodCheckJWTParams = CheckStringFormatParams<schemas.$ZodJWT, "pattern" | "when">;
+diff --git a/packages/zod/src/v4/core/compile.ts b/packages/zod/src/v4/core/compile.ts
+index 361b4e0..eabe430 100644
+--- a/packages/zod/src/v4/core/compile.ts
++++ b/packages/zod/src/v4/core/compile.ts
+@@ -9,7 +9,6 @@ import {
+   isValidBase64URL,
+   isValidCIDRv6,
+   isValidCreditCard,
+-  isValidIBAN,
+   isValidIPv6,
+   isValidJWT,
+   mergeValues,
+@@ -839,11 +838,6 @@ function generateStringFormatCheck(
+     doc.write(`if (!${validator}(${accessor})) return INVALID;`);
+     return accessor;
+   }
+-  if (fmt === "iban") {
+-    const validator = addConstant(ctx, isValidIBAN);
+-    doc.write(`if (!${validator}(${accessor})) return INVALID;`);
+-    return accessor;
+-  }
+   const formatDef = def as unknown as { normalize?: boolean; hostname?: unknown; protocol?: unknown };
+   if (
+     fmt === "url" ||
+diff --git a/packages/zod/src/v4/core/regexes.ts b/packages/zod/src/v4/core/regexes.ts
+index f41d913..00438e0 100644
+--- a/packages/zod/src/v4/core/regexes.ts
++++ b/packages/zod/src/v4/core/regexes.ts
+@@ -102,9 +102,6 @@ export const creditCard: RegExp = /^\d(?:[ -]?\d){11,18}$/;
+ export const currencyCode: RegExp =
+   /^(?:AED|AFN|ALL|AMD|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BHD|BIF|BMD|BND|BOB|BOV|BRL|BSD|BTN|BWP|BYN|BZD|CAD|CDF|CHE|CHF|CHW|CLF|CLP|CNY|COP|COU|CRC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HTG|HUF|IDR|ILS|INR|IQD|IRR|ISK|JMD|JOD|JPY|KES|KGS|KHR|KMF|KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRU|MUR|MVR|MWK|MXN|MXV|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLE|SOS|SRD|SSP|STN|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|USN|UYI|UYU|UYW|UZS|VED|VES|VND|VUV|WST|XAD|XAF|XAG|XAU|XBA|XBB|XBC|XBD|XCD|XCG|XDR|XOF|XPD|XPF|XPT|XSU|XTS|XUA|XXX|YER|ZAR|ZMW|ZWG)$/;
+ 
+-// iban electronic format: 2-letter country, check digits 02-98 (the only values `98 - remainder` can produce), 11-30 bban characters
+-export const iban: RegExp = /^[A-Z]{2}(?!00|01|99)\d{2}[A-Z0-9]{11,30}$/;
+-
+ const dateSource = `(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))`;
+ 
+ /** Anchors a pattern source. The interpolation lives here rather than at the call site because
+diff --git a/packages/zod/src/v4/core/schemas.ts b/packages/zod/src/v4/core/schemas.ts
+index f02b98d..88e029a 100644
+--- a/packages/zod/src/v4/core/schemas.ts
++++ b/packages/zod/src/v4/core/schemas.ts
+@@ -1163,53 +1163,6 @@ export const $ZodCreditCard: core.$constructor<$ZodCreditCard> = /*@__PURE__*/ c
+   }
+ );
+ 
+-//////////////////////////////   ZodIBAN   //////////////////////////////
+-
+-// iso 7064 mod 97-10 checksum without BigInt
+-function isIso7064Mod97(iban: string): boolean {
+-  let remainder = 0;
+-  const len = iban.length;
+-  for (let i = 4; i < len; i++) {
+-    const code = iban.charCodeAt(i);
+-    remainder = (code >= 65 ? remainder * 100 + (code - 55) : remainder * 10 + (code - 48)) % 97;
+-  }
+-  for (let i = 0; i < 4; i++) {
+-    const code = iban.charCodeAt(i);
+-    remainder = (code >= 65 ? remainder * 100 + (code - 55) : remainder * 10 + (code - 48)) % 97;
+-  }
+-  return remainder === 1;
+-}
+-
+-export function isValidIBAN(input: string): boolean {
+-  if (!regexes.iban.test(input)) return false;
+-  return isIso7064Mod97(input);
+-}
+-
+-export interface $ZodIBANDef extends $ZodStringFormatDef<"iban"> {}
+-export interface $ZodIBANInternals extends $ZodStringFormatInternals<"iban"> {
+-  def: $ZodIBANDef;
+-}
+-
+-export interface $ZodIBAN extends $ZodType {
+-  _zod: $ZodIBANInternals;
+-}
+-
+-export const $ZodIBAN: core.$constructor<$ZodIBAN> = /*@__PURE__*/ core.$constructor("$ZodIBAN", (inst, def): void => {
+-  // shape only — checksum is not expressible as a pattern
+-  def.pattern ??= regexes.iban;
+-  $ZodStringFormat.init(inst, def);
+-  inst._zod.check = (payload) => {
+-    if (isValidIBAN(payload.value)) return;
+-    payload.issues.push({
+-      code: "invalid_format",
+-      format: "iban",
+-      input: payload.value,
+-      inst,
+-      continue: !def.abort,
+-    });
+-  };
+-});
+-
+ //////////////////////////////   ZodJWT   //////////////////////////////
+ 
+ export function isValidJWT(token: string, algorithm: util.JWTAlgorithm | null = null): boolean {
+@@ -5301,7 +5254,6 @@ export type $ZodStringFormatTypes =
+   | $ZodBase64URL
+   | $ZodE164
+   | $ZodCreditCard
+-  | $ZodIBAN
+   | $ZodJWT
+   | $ZodCustomStringFormat<"hex">
+   | $ZodCustomStringFormat<util.HashFormat>
+diff --git a/packages/zod/src/v4/mini/schemas.ts b/packages/zod/src/v4/mini/schemas.ts
+index 00ce2bc..7636c3d 100644
+--- a/packages/zod/src/v4/mini/schemas.ts
++++ b/packages/zod/src/v4/mini/schemas.ts
+@@ -510,21 +510,6 @@ export function creditCard(params?: string | core.$ZodCreditCardParams): ZodMini
+   return core._creditCard(ZodMiniCreditCard, params);
+ }
+ 
+-// ZodMiniIBAN
+-export interface ZodMiniIBAN extends _ZodMiniString<core.$ZodIBANInternals> {}
+-export const ZodMiniIBAN: core.$constructor<ZodMiniIBAN> = /*@__PURE__*/ core.$constructor(
+-  "ZodMiniIBAN",
+-  (inst, def) => {
+-    core.$ZodIBAN.init(inst, def);
+-    ZodMiniStringFormat.init(inst, def);
+-  }
+-);
+-
+-// @__NO_SIDE_EFFECTS__
+-export function iban(params?: string | core.$ZodIBANParams): ZodMiniIBAN {
+-  return core._iban(ZodMiniIBAN, params);
+-}
+-
+ // ZodMiniJWT
+ export interface ZodMiniJWT extends _ZodMiniString<core.$ZodJWTInternals> {
+   // _zod: core.$ZodJWTInternals;
+diff --git a/packages/zod/src/v4/mini/tests/string.test.ts b/packages/zod/src/v4/mini/tests/string.test.ts
+index ae51636..443201f 100644
+--- a/packages/zod/src/v4/mini/tests/string.test.ts
++++ b/packages/zod/src/v4/mini/tests/string.test.ts
+@@ -338,22 +338,6 @@ test("z.creditCard", () => {
+   expect(() => z.parse(a, 123)).toThrow();
+ });
+ 
+-test("z.iban", () => {
+-  const a = z.iban();
+-  // valid iban
+-  expect(z.parse(a, "DE89370400440532013000")).toEqual("DE89370400440532013000");
+-  expect(z.parse(a, "NO9386011117947")).toEqual("NO9386011117947");
+-  // failed mod 97 checksum
+-  expect(() => z.parse(a, "DE89370400440532013001")).toThrow();
+-  // formatting violations
+-  expect(() => z.parse(a, "de89370400440532013000")).toThrow();
+-  expect(() => z.parse(a, "DE89 3704 0044 0532 0130 00")).toThrow();
+-  expect(() => z.parse(a, "NO938601111794")).toThrow();
+-  expect(() => z.parse(a, "hello")).toThrow();
+-  // wrong type
+-  expect(() => z.parse(a, 123)).toThrow();
+-});
+-
+ test("z.jwt", () => {
+   const a = z.jwt();
+   // valid jwt

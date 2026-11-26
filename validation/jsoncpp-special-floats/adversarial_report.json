@@ -1,0 +1,215 @@
+{
+  "task": "jsoncpp-special-floats",
+  "control_reward": 1,
+  "mutants": 14,
+  "killed": 14,
+  "kill_rate": 1.0,
+  "survivors": [],
+  "upstream_tests_only_killed": 11,
+  "results": [
+    {
+      "id": "nan-decoded-as-zero",
+      "description": "NaN token decodes to 0.0",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.6364,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "hidden/SpecialFloatsEnabled/parsesAllFourSpellings",
+        "hidden/SpecialFloatsEnabled/roundTripsWithWriterSpecialFloats",
+        "hidden/SpecialFloatsEnabled/worksInArraysAndAtTopLevel",
+        "unit/CharReaderAllowSpecialFloatsTest/issue209"
+      ]
+    },
+    {
+      "id": "nan-decoded-as-null",
+      "description": "NaN token decodes to a null value",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.6364,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "hidden/SpecialFloatsEnabled/parsesAllFourSpellings",
+        "hidden/SpecialFloatsEnabled/roundTripsWithWriterSpecialFloats",
+        "hidden/SpecialFloatsEnabled/worksInArraysAndAtTopLevel",
+        "unit/CharReaderAllowSpecialFloatsTest/issue209"
+      ]
+    },
+    {
+      "id": "negative-infinity-sign-lost",
+      "description": "-Infinity decodes to +infinity",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.5455,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "hidden/SpecialFloatsEnabled/combinesWithOtherSettings",
+        "hidden/SpecialFloatsEnabled/parsesAllFourSpellings",
+        "hidden/SpecialFloatsEnabled/roundTripsWithWriterSpecialFloats",
+        "hidden/SpecialFloatsEnabled/worksInArraysAndAtTopLevel",
+        "unit/CharReaderAllowSpecialFloatsTest/issue209"
+      ]
+    },
+    {
+      "id": "plus-infinity-unsupported",
+      "description": "+Infinity spelling not supported",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.6364,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "hidden/SpecialFloatsEnabled/parsesAllFourSpellings",
+        "hidden/SpecialFloatsEnabled/recordsValueOffsets",
+        "unit/CharReaderAllowSpecialFloatsTest/issue209",
+        "unit/CharReaderTest/parseWithNoErrorsTestingOffsets"
+      ]
+    },
+    {
+      "id": "negative-infinity-unsupported",
+      "description": "'-' always reads a number, so -Infinity is rejected",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.4545,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "hidden/SpecialFloatsEnabled/combinesWithOtherSettings",
+        "hidden/SpecialFloatsEnabled/parsesAllFourSpellings",
+        "hidden/SpecialFloatsEnabled/recordsValueOffsets",
+        "hidden/SpecialFloatsEnabled/roundTripsWithWriterSpecialFloats",
+        "hidden/SpecialFloatsEnabled/worksInArraysAndAtTopLevel",
+        "unit/CharReaderAllowSpecialFloatsTest/issue209"
+      ]
+    },
+    {
+      "id": "infinity-check-off-by-one",
+      "description": "Sign handling does not consume the 'I', so the rest of the token never matches",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.4545,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "hidden/SpecialFloatsEnabled/combinesWithOtherSettings",
+        "hidden/SpecialFloatsEnabled/parsesAllFourSpellings",
+        "hidden/SpecialFloatsEnabled/recordsValueOffsets",
+        "hidden/SpecialFloatsEnabled/roundTripsWithWriterSpecialFloats",
+        "hidden/SpecialFloatsEnabled/worksInArraysAndAtTopLevel",
+        "unit/CharReaderAllowSpecialFloatsTest/issue209"
+      ]
+    },
+    {
+      "id": "setting-ignored-always-on",
+      "description": "Special floats accepted even when the setting is false",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 1.0,
+      "regression_ok": 0,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "hidden/SpecialFloatsDisabled/defaultErrorMessages",
+        "hidden/SpecialFloatsDisabled/rejectedByDefault",
+        "unit/CharReaderAllowSpecialFloatsTest/specialFloat"
+      ]
+    },
+    {
+      "id": "nan-ignores-setting",
+      "description": "NaN accepted regardless of the setting (Infinity respects it)",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 1.0,
+      "regression_ok": 0,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "hidden/SpecialFloatsDisabled/defaultErrorMessages",
+        "hidden/SpecialFloatsDisabled/rejectedByDefault",
+        "unit/CharReaderAllowSpecialFloatsTest/specialFloat"
+      ]
+    },
+    {
+      "id": "default-enabled",
+      "description": "setDefaults() turns the setting on",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.9091,
+      "regression_ok": 0,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "hidden/SpecialFloatsDisabled/defaultErrorMessages",
+        "hidden/SpecialFloatsDisabled/rejectedByDefault",
+        "hidden/SpecialFloatsSettings/defaultsIncludeSettingAsFalse",
+        "unit/CharReaderAllowSpecialFloatsTest/specialFloat"
+      ]
+    },
+    {
+      "id": "strict-mode-missing-key",
+      "description": "strictMode() does not set the key",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.9091,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": false,
+      "failed_tests": [
+        "hidden/SpecialFloatsSettings/strictAndEcma404ModesDisableIt"
+      ]
+    },
+    {
+      "id": "ecma404-mode-missing-key",
+      "description": "ecma404Mode() does not set the key",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.9091,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": false,
+      "failed_tests": [
+        "hidden/SpecialFloatsSettings/strictAndEcma404ModesDisableIt"
+      ]
+    },
+    {
+      "id": "key-not-validated",
+      "description": "validate() does not list the new key",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.8182,
+      "regression_ok": 0,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "hidden/SpecialFloatsSettings/validateAcceptsTheKey",
+        "unit/BuilderTest/settings",
+        "unit/FuzzTest/fuzzDoesntCrash"
+      ]
+    },
+    {
+      "id": "offsets-not-recorded",
+      "description": "NaN values do not record source offsets",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.9091,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": false,
+      "failed_tests": [
+        "hidden/SpecialFloatsEnabled/recordsValueOffsets"
+      ]
+    },
+    {
+      "id": "infinity-prefix-only",
+      "description": "Only 'Inf' is matched, so 'Infinity' leaves trailing characters",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.6364,
+      "regression_ok": 0,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "hidden/SpecialFloatsEnabled/parsesAllFourSpellings",
+        "hidden/SpecialFloatsEnabled/roundTripsWithWriterSpecialFloats",
+        "hidden/SpecialFloatsEnabled/spellingIsExactAndCaseSensitive",
+        "hidden/SpecialFloatsEnabled/worksInArraysAndAtTopLevel",
+        "unit/CharReaderAllowSpecialFloatsTest/issue209"
+      ]
+    }
+  ]
+}

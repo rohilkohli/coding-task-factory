@@ -1,0 +1,33 @@
+--- a/src/lib_json/json_value.cpp
++++ b/src/lib_json/json_value.cpp
+@@ -4,6 +4,7 @@
+ // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
+ 
+ #if !defined(JSON_IS_AMALGAMATION)
++#include <stdexcept>
+ #include <json/assertions.h>
+ #include <json/value.h>
+ #include <json/writer.h>
+@@ -1726,21 +1727,7 @@
+ }
+ 
+ Value Path::resolve(const Value& root, const Value& defaultValue) const {
+-  const Value* node = &root;
+-  for (const auto& arg : args_) {
+-    if (arg.kind_ == PathArgument::kindIndex) {
+-      if (!node->isArray() || !node->isValidIndex(arg.index_))
+-        return defaultValue;
+-      node = &((*node)[arg.index_]);
+-    } else if (arg.kind_ == PathArgument::kindKey) {
+-      if (!node->isObject())
+-        return defaultValue;
+-      node = &((*node)[arg.key_]);
+-      if (node == &Value::nullSingleton())
+-        return defaultValue;
+-    }
+-  }
+-  return *node;
++  throw std::logic_error("not implemented");
+ }
+ 
+ Value& Path::make(Value& root) const {

@@ -1,0 +1,11 @@
+--- a/src/lib_json/json_value.cpp
++++ b/src/lib_json/json_value.cpp
+@@ -363,7 +363,7 @@
+ }
+ 
+ bool Value::CZString::operator==(const CZString& other) const {
+-  if (!cstr_)
++  if (cstr_)
+     return index_ == other.index_;
+   // return strcmp(cstr_, other.cstr_) == 0;
+   // Assume both are strings.

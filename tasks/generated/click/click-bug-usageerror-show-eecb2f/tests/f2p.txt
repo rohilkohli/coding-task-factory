@@ -1,0 +1,37 @@
+tests.test_basic::test_string_option[args2-Error: Option '--s' requires an argument.]
+tests.test_formatting::test_formatting_usage_custom_help
+tests.test_formatting::test_formatting_usage_error
+tests.test_formatting::test_formatting_usage_error_help_hint[help_names0-extra_options0-Try 'cli foo --help' for help.]
+tests.test_formatting::test_formatting_usage_error_help_hint[help_names1-extra_options1-Try 'cli foo --help' for help.]
+tests.test_formatting::test_formatting_usage_error_help_hint[help_names2-extra_options2-Try 'cli foo -h' for help.]
+tests.test_formatting::test_formatting_usage_error_help_hint[help_names3-extra_options3-None]
+tests.test_formatting::test_formatting_usage_error_help_hint[help_names4-extra_options4-Try 'cli foo --man' for help.]
+tests.test_formatting::test_formatting_usage_error_help_hint[help_names5-extra_options5-Try 'cli foo --help' for help.]
+tests.test_formatting::test_formatting_usage_error_metavar_bad_arg
+tests.test_formatting::test_formatting_usage_error_metavar_missing_arg
+tests.test_formatting::test_formatting_usage_error_nested
+tests.test_formatting::test_formatting_usage_error_no_help
+tests.test_options::test_choice_usage_rendering[Color-[COLOR]]
+tests.test_options::test_choice_usage_rendering[ColorInt-[COLORINT]]
+tests.test_options::test_choice_usage_rendering[HashType-[HASHTYPE]]
+tests.test_options::test_choice_usage_rendering[Letter-[LETTER]]
+tests.test_options::test_choice_usage_rendering[Number-[NUMBER]]
+tests.test_options::test_choice_usage_rendering[choices0-[TEXT]]
+tests.test_options::test_choice_usage_rendering[choices1-[INTEGER]]
+tests.test_options::test_choice_usage_rendering[choices2-[FLOAT]]
+tests.test_options::test_choice_usage_rendering[choices3-[BOOLEAN]]
+tests.test_options::test_choice_usage_rendering[choices4-[TEXT|INTEGER]]
+tests.test_options::test_custom_type_flag_value_standalone_option[opt_params10-args10-Error:\\ Option\\ '\\-\\-pro'\\ requires\\ an\\ argument\\.\\\n]
+tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args1-Error:\\ Option\\ '\\-\\-config'\\ requires\\ an\\ argument\\.\\\n-EnumSentinel.FALSY_SENTINEL]
+tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args1-Error:\\ Option\\ '\\-\\-config'\\ requires\\ an\\ argument\\.\\\n-sentinel0]
+tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args2-Error:\\ Option\\ '\\-\\-config'\\ requires\\ an\\ argument\\.\\\n-EnumSentinel.FALSY_SENTINEL]
+tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args2-Error:\\ Option\\ '\\-\\-config'\\ requires\\ an\\ argument\\.\\\n-sentinel0]
+tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args5-Usage: main \\[OPTIONS\\]\\nTry 'main --help' for help.\\n\\nError: Got unexpected extra argument (.+)\\n-EnumSentinel.FALSY_SENTINEL]
+tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args5-Usage: main \\[OPTIONS\\]\\nTry 'main --help' for help.\\n\\nError: Got unexpected extra argument (.+)\\n-sentinel0]
+tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args6-Usage: main \\[OPTIONS\\]\\nTry 'main --help' for help.\\n\\nError: Invalid value for '-c' / '--config': File 'random-file.conf' does not exist.\\n-EnumSentinel.FALSY_SENTINEL]
+tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args6-Usage: main \\[OPTIONS\\]\\nTry 'main --help' for help.\\n\\nError: Invalid value for '-c' / '--config': File 'random-file.conf' does not exist.\\n-sentinel0]
+tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args7-Usage: main \\[OPTIONS\\]\\nTry 'main --help' for help.\\n\\nError: Invalid value for '-c' / '--config': File '--no-config' does not exist.\\n-EnumSentinel.FALSY_SENTINEL]
+tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args7-Usage: main \\[OPTIONS\\]\\nTry 'main --help' for help.\\n\\nError: Invalid value for '-c' / '--config': File '--no-config' does not exist.\\n-sentinel0]
+tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args8-Usage: main \\[OPTIONS\\]\\nTry 'main --help' for help.\\n\\nError: Invalid value for '-c' / '--config': File '--no-config' does not exist.\\n-EnumSentinel.FALSY_SENTINEL]
+tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args8-Usage: main \\[OPTIONS\\]\\nTry 'main --help' for help.\\n\\nError: Invalid value for '-c' / '--config': File '--no-config' does not exist.\\n-sentinel0]
+tests.test_termui::test_prompt_required_with_required[True-False-args1-Option '-v' requires an argument.]

@@ -1,0 +1,9 @@
+{
+  "task": "zod-iban-format",
+  "f2p": 56,
+  "p2p": 5519,
+  "flaky_excluded": [],
+  "reference_not_passing": 0,
+  "check_reference_reward": 1,
+  "check_untouched_reward": 0
+}

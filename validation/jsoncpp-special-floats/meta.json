@@ -1,0 +1,7 @@
+{
+  "upstream_tests": [
+    "unit/CharReaderAllowSpecialFloatsTest/",
+    "unit/FuzzTest/fuzzDoesntCrash",
+    "unit/CharReaderTest/parseWithNoErrorsTestingOffsets"
+  ]
+}

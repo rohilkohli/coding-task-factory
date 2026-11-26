@@ -1,0 +1,99 @@
+[
+  {
+    "id": "nan-decoded-as-zero",
+    "description": "NaN token decodes to 0.0",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "    Value v(std::numeric_limits<double>::quiet_NaN());",
+               "new": "    Value v(0.0);"}]
+  },
+  {
+    "id": "nan-decoded-as-null",
+    "description": "NaN token decodes to a null value",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "  case tokenNaN: {\n    Value v(std::numeric_limits<double>::quiet_NaN());",
+               "new": "  case tokenNaN: {\n    Value v;"}]
+  },
+  {
+    "id": "negative-infinity-sign-lost",
+    "description": "-Infinity decodes to +infinity",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "    Value v(-std::numeric_limits<double>::infinity());",
+               "new": "    Value v(std::numeric_limits<double>::infinity());"}]
+  },
+  {
+    "id": "plus-infinity-unsupported",
+    "description": "+Infinity spelling not supported",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "  case '+':\n    if (readNumber(true)) {\n      token.type_ = tokenNumber;\n    } else {\n      token.type_ = tokenPosInf;\n      ok = features_.allowSpecialFloats_ && match(\"nfinity\", 7);\n    }\n    break;\n",
+               "new": ""}]
+  },
+  {
+    "id": "negative-infinity-unsupported",
+    "description": "'-' always reads a number, so -Infinity is rejected",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "  case '-':\n    if (readNumber(true)) {\n      token.type_ = tokenNumber;\n    } else {\n      token.type_ = tokenNegInf;\n      ok = features_.allowSpecialFloats_ && match(\"nfinity\", 7);\n    }\n    break;\n",
+               "new": "  case '-':\n    token.type_ = tokenNumber;\n    readNumber(false);\n    break;\n"}]
+  },
+  {
+    "id": "infinity-check-off-by-one",
+    "description": "Sign handling does not consume the 'I', so the rest of the token never matches",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "  if (checkInf && p != end_ && *p == 'I') {\n    current_ = ++p;",
+               "new": "  if (checkInf && p != end_ && *p == 'I') {\n    current_ = p;"}]
+  },
+  {
+    "id": "setting-ignored-always-on",
+    "description": "Special floats accepted even when the setting is false",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "  features.allowSpecialFloats_ = settings_[\"allowSpecialFloats\"].asBool();",
+               "new": "  features.allowSpecialFloats_ = true;"}]
+  },
+  {
+    "id": "nan-ignores-setting",
+    "description": "NaN accepted regardless of the setting (Infinity respects it)",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "  case 'N':\n    if (features_.allowSpecialFloats_) {",
+               "new": "  case 'N':\n    if (true) {"}]
+  },
+  {
+    "id": "default-enabled",
+    "description": "setDefaults() turns the setting on",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "  (*settings)[\"rejectDupKeys\"] = false;\n  (*settings)[\"allowSpecialFloats\"] = false;\n  (*settings)[\"skipBom\"] = true;",
+               "new": "  (*settings)[\"rejectDupKeys\"] = false;\n  (*settings)[\"allowSpecialFloats\"] = true;\n  (*settings)[\"skipBom\"] = true;"}]
+  },
+  {
+    "id": "strict-mode-missing-key",
+    "description": "strictMode() does not set the key",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "  (*settings)[\"rejectDupKeys\"] = true;\n  (*settings)[\"allowSpecialFloats\"] = false;\n",
+               "new": "  (*settings)[\"rejectDupKeys\"] = true;\n"}]
+  },
+  {
+    "id": "ecma404-mode-missing-key",
+    "description": "ecma404Mode() does not set the key",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "  (*settings)[\"allowSpecialFloats\"] = false;\n  (*settings)[\"skipBom\"] = false;",
+               "new": "  (*settings)[\"skipBom\"] = false;"}]
+  },
+  {
+    "id": "key-not-validated",
+    "description": "validate() does not list the new key",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "      \"allowSpecialFloats\",\n", "new": ""}]
+  },
+  {
+    "id": "offsets-not-recorded",
+    "description": "NaN values do not record source offsets",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "  case tokenNaN: {\n    Value v(std::numeric_limits<double>::quiet_NaN());\n    currentValue().swapPayload(v);\n    currentValue().setOffsetStart(token.start_ - begin_);\n    currentValue().setOffsetLimit(token.end_ - begin_);",
+               "new": "  case tokenNaN: {\n    Value v(std::numeric_limits<double>::quiet_NaN());\n    currentValue().swapPayload(v);"}]
+  },
+  {
+    "id": "infinity-prefix-only",
+    "description": "Only 'Inf' is matched, so 'Infinity' leaves trailing characters",
+    "edits": [{"file": "src/lib_json/json_reader.cpp",
+               "old": "  case 'I':\n    if (features_.allowSpecialFloats_) {\n      token.type_ = tokenPosInf;\n      ok = match(\"nfinity\", 7);",
+               "new": "  case 'I':\n    if (features_.allowSpecialFloats_) {\n      token.type_ = tokenPosInf;\n      ok = match(\"nf\", 2);"}]
+  }
+]

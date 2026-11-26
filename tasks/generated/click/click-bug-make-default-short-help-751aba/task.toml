@@ -1,0 +1,47 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/src" }]
+
+[task]
+name = "coding-task-factory/click-bug-make-default-short-help-751aba"
+version = "1.0.0"
+description = "Fix a regression injected into _make_default_short_help (src/click/utils.py)"
+authors = []
+keywords = ["python", "click", "bug-fix", "generated"]
+
+[metadata]
+generator = "bug-injection"
+seed = 1
+source_repo = "https://github.com/pallets/click"
+source_commit = "08b803cf32ceb2ae6a772c62d5da42757a897d44"
+language = "python"
+file = "src/click/utils.py"
+function = "_make_default_short_help"
+line = 58
+change = "`and` -> `or`"
+f2p_tests = 31
+p2p_tests = 2572
+adversarial_mutants = 6
+adversarial_killed = 6
+difficulty = "easy"
+difficulty_explanation = "Single-token defect (`and` -> `or`) detected by 31 failing test(s); hint: failing tests only."
+category = "bug-fix"
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048

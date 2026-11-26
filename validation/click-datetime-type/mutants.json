@@ -1,0 +1,100 @@
+[
+  {
+    "id": "default-order-swapped",
+    "description": "Default formats listed in a different order",
+    "file": "src/click/types.py",
+    "old": "            \"%Y-%m-%dT%H:%M:%S\",\n            \"%Y-%m-%d %H:%M:%S\",\n        ]",
+    "new": "            \"%Y-%m-%d %H:%M:%S\",\n            \"%Y-%m-%dT%H:%M:%S\",\n        ]"
+  },
+  {
+    "id": "missing-space-default",
+    "description": "Space-separated datetime format dropped from defaults",
+    "file": "src/click/types.py",
+    "old": "            \"%Y-%m-%dT%H:%M:%S\",\n            \"%Y-%m-%d %H:%M:%S\",\n        ]",
+    "new": "            \"%Y-%m-%dT%H:%M:%S\",\n        ]"
+  },
+  {
+    "id": "last-match-wins",
+    "description": "Formats tried in reverse order",
+    "file": "src/click/types.py",
+    "old": "        for format in self.formats:\n            converted = self._try_to_convert_date(value, format)",
+    "new": "        for format in reversed(self.formats):\n            converted = self._try_to_convert_date(value, format)"
+  },
+  {
+    "id": "no-datetime-passthrough",
+    "description": "Existing datetime values are re-parsed instead of returned unchanged",
+    "file": "src/click/types.py",
+    "old": "        if isinstance(value, datetime):\n            return value\n\n        for format",
+    "new": "        for format"
+  },
+  {
+    "id": "returns-date",
+    "description": "Returns a datetime.date instead of a datetime.datetime",
+    "file": "src/click/types.py",
+    "old": "            if converted is not None:\n                return converted",
+    "new": "            if converted is not None:\n                return converted.date()"
+  },
+  {
+    "id": "copy-of-datetime",
+    "description": "Datetime inputs are copied rather than returned as the same object",
+    "file": "src/click/types.py",
+    "old": "        if isinstance(value, datetime):\n            return value",
+    "new": "        if isinstance(value, datetime):\n            return value.replace()"
+  },
+  {
+    "id": "always-plural-message",
+    "description": "Plural error wording used even for a single format",
+    "file": "src/click/types.py",
+    "old": "                \"{value!r} does not match the format {format}.\",",
+    "new": "                \"{value!r} does not match the formats {format}.\","
+  },
+  {
+    "id": "unquoted-formats",
+    "description": "Formats in the error message are not repr-quoted",
+    "file": "src/click/types.py",
+    "old": "        formats_str = \", \".join(map(repr, self.formats))",
+    "new": "        formats_str = \", \".join(self.formats)"
+  },
+  {
+    "id": "metavar-comma",
+    "description": "Metavar joins formats with commas instead of pipes",
+    "file": "src/click/types.py",
+    "old": "        return f\"[{'|'.join(self.formats)}]\"",
+    "new": "        return f\"[{','.join(self.formats)}]\""
+  },
+  {
+    "id": "metavar-no-brackets",
+    "description": "Metavar is not wrapped in square brackets",
+    "file": "src/click/types.py",
+    "old": "        return f\"[{'|'.join(self.formats)}]\"",
+    "new": "        return '|'.join(self.formats)"
+  },
+  {
+    "id": "info-dict-missing-formats",
+    "description": "to_info_dict omits the formats key",
+    "file": "src/click/types.py",
+    "old": "        return {\"formats\": self.formats, **super().to_info_dict()}",
+    "new": "        return super().to_info_dict()"
+  },
+  {
+    "id": "wrong-name",
+    "description": "Type name is 'date' instead of 'datetime'",
+    "file": "src/click/types.py",
+    "old": "    name = \"datetime\"\n\n    formats: cabc.Sequence[str]",
+    "new": "    name = \"date\"\n\n    formats: cabc.Sequence[str]"
+  },
+  {
+    "id": "wrong-repr",
+    "description": "repr() returns 'DateTime()'",
+    "file": "src/click/types.py",
+    "old": "    def __repr__(self) -> str:\n        return \"DateTime\"",
+    "new": "    def __repr__(self) -> str:\n        return \"DateTime()\""
+  },
+  {
+    "id": "not-exported",
+    "description": "Class implemented but not exported from the click package",
+    "file": "src/click/__init__.py",
+    "old": "from .types import DateTime as DateTime\n",
+    "new": ""
+  }
+]

@@ -1,0 +1,40 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/src", exclude = ["__pycache__"] }]
+
+[task]
+name = "coding-task-factory/click-datetime-type"
+version = "1.0.0"
+description = "Re-implement click's DateTime parameter type (feature-removal task)."
+authors = []
+keywords = ["python", "click", "feature-implementation", "cli"]
+
+[metadata]
+generator = "feature-removal"
+source_repo = "https://github.com/pallets/click"
+source_commit = "08b803cf32ceb2ae6a772c62d5da42757a897d44"
+language = "python"
+difficulty = "easy"
+difficulty_explanation = "Single self-contained class (~70 lines) with a precise behavioural spec; requires reading the ParamType API and click's error conventions."
+category = "feature-implementation"
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "separate"
+
+# Dedicated grading sandbox built from tests/Dockerfile. It receives only the
+# agent's /app/src (see artifacts), never the agent's tests or config.
+[verifier.environment]
+build_timeout_sec = 600.0
+os = "linux"
+cpus = 1
+memory_mb = 2048
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 600.0
+os = "linux"
+cpus = 1
+memory_mb = 2048

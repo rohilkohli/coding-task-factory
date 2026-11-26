@@ -1,0 +1,259 @@
+{
+  "task": "zod-iban-format",
+  "control_reward": 1,
+  "mutants": 14,
+  "killed": 14,
+  "kill_rate": 1.0,
+  "survivors": [],
+  "upstream_tests_only_killed": 9,
+  "results": [
+    {
+      "id": "no-checksum",
+      "description": "Only the shape regex is checked; the mod-97 checksum is skipped",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.8036,
+      "regression_ok": 0,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) JSON Schema export and import keep the IBAN semantics",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) compiled schemas enforce the checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) composes with optional and inside objects",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) core isValidIBAN checks shape and mod-97 checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) does not abort later checks unless abort: true is set",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) letters in the BBAN take part in the checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) reports an invalid_format issue with format 'iban'",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) works as a check on z.string()",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) zod/mini enforces shape and checksum",
+        "src/v4/classic/tests/iban.test.ts > z.iban rejects invalid check digits (checksum failure)",
+        "src/v4/classic/tests/iban.test.ts > z.iban round-trips through JSON Schema with the checksum intact",
+        "src/v4/mini/tests/string.test.ts > z.iban"
+      ]
+    },
+    {
+      "id": "lowercase-allowed",
+      "description": "Regex accepts lowercase letters",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.9821,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": false,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) regexes.iban describes the shape only"
+      ]
+    },
+    {
+      "id": "check-digits-unrestricted",
+      "description": "Check digits 00, 01 and 99 are not rejected",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.9643,
+      "regression_ok": 0,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) core isValidIBAN checks shape and mod-97 checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) regexes.iban describes the shape only",
+        "src/v4/classic/tests/iban.test.ts > z.iban rejects check digits outside 02-98"
+      ]
+    },
+    {
+      "id": "length-upper-bound-wrong",
+      "description": "BBAN allowed up to 32 characters (total length 36)",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.9821,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": false,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) enforces the 15-34 length bounds even when the checksum is valid"
+      ]
+    },
+    {
+      "id": "length-lower-bound-wrong",
+      "description": "BBAN allowed down to 10 characters (total length 14)",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.9643,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": false,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) enforces the 15-34 length bounds even when the checksum is valid",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) regexes.iban describes the shape only"
+      ]
+    },
+    {
+      "id": "letters-map-from-one",
+      "description": "Letters converted as A=1 instead of A=10",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.6429,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) JSON Schema export and import keep the IBAN semantics",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) compiled schemas enforce the checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) composes with optional and inside objects",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) core isValidIBAN checks shape and mod-97 checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) letters in the BBAN take part in the checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) works as a check on z.string()",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) zod/mini enforces shape and checksum",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Belgium (16)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Cyprus (28)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts France (27)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Germany (22)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Great Britain (22)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Malta (31)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Maximum length (34)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Maximum length mixed (34)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Netherlands (18)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Norway (15, minimum)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Turkey (26)",
+        "src/v4/classic/tests/iban.test.ts > z.iban round-trips through JSON Schema with the checksum intact",
+        "src/v4/mini/tests/string.test.ts > z.iban"
+      ]
+    },
+    {
+      "id": "no-rearrangement",
+      "description": "Checksum computed without moving the first four characters to the end",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.6429,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) JSON Schema export and import keep the IBAN semantics",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) compiled schemas enforce the checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) composes with optional and inside objects",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) core isValidIBAN checks shape and mod-97 checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) letters in the BBAN take part in the checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) works as a check on z.string()",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) zod/mini enforces shape and checksum",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Belgium (16)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Cyprus (28)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts France (27)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Germany (22)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Great Britain (22)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Malta (31)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Maximum length (34)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Maximum length mixed (34)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Netherlands (18)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Norway (15, minimum)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Turkey (26)",
+        "src/v4/classic/tests/iban.test.ts > z.iban round-trips through JSON Schema with the checksum intact",
+        "src/v4/mini/tests/string.test.ts > z.iban"
+      ]
+    },
+    {
+      "id": "remainder-zero",
+      "description": "Valid when remainder is 0 instead of 1",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.6429,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) JSON Schema export and import keep the IBAN semantics",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) compiled schemas enforce the checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) composes with optional and inside objects",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) core isValidIBAN checks shape and mod-97 checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) letters in the BBAN take part in the checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) works as a check on z.string()",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) zod/mini enforces shape and checksum",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Belgium (16)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Cyprus (28)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts France (27)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Germany (22)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Great Britain (22)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Malta (31)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Maximum length (34)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Maximum length mixed (34)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Netherlands (18)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Norway (15, minimum)",
+        "src/v4/classic/tests/iban.test.ts > z.iban accepts Turkey (26)",
+        "src/v4/classic/tests/iban.test.ts > z.iban round-trips through JSON Schema with the checksum intact",
+        "src/v4/mini/tests/string.test.ts > z.iban"
+      ]
+    },
+    {
+      "id": "compiler-not-updated",
+      "description": "AOT compiler has no IBAN branch (falls back to the shape pattern)",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.9821,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": false,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) compiled schemas enforce the checksum"
+      ]
+    },
+    {
+      "id": "from-json-schema-not-mapped",
+      "description": "fromJSONSchema does not map format 'iban'",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.9643,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) JSON Schema export and import keep the IBAN semantics",
+        "src/v4/classic/tests/iban.test.ts > z.iban round-trips through JSON Schema with the checksum intact"
+      ]
+    },
+    {
+      "id": "json-schema-pattern-missing",
+      "description": "Shape regex not attached as the schema pattern (JSON Schema lacks 'pattern')",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.9643,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) JSON Schema export and import keep the IBAN semantics",
+        "src/v4/classic/tests/iban.test.ts > z.iban carries the shape regex as its JSON Schema pattern"
+      ]
+    },
+    {
+      "id": "issue-format-copy-paste",
+      "description": "Issue reports format 'credit_card' (copied from the credit card validator)",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.9464,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) reports an invalid_format issue with format 'iban'",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) zod/mini enforces shape and checksum",
+        "src/v4/classic/tests/iban.test.ts > z.iban error message references IBAN"
+      ]
+    },
+    {
+      "id": "mini-api-missing",
+      "description": "zod/mini does not expose iban()",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.8929,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": true,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) is exported from classic, mini and core",
+        "src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) zod/mini enforces shape and checksum",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) is exported from classic, mini and core",
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) zod/mini enforces shape and checksum",
+        "src/v4/mini/tests/string.test.ts > src/v4/mini/tests/string.test.ts z.iban",
+        "src/v4/mini/tests/string.test.ts > z.iban"
+      ]
+    },
+    {
+      "id": "aborts-further-checks",
+      "description": "IBAN failure always aborts instead of honouring the abort flag",
+      "reward": 0,
+      "killed": true,
+      "feature_pass_rate": 0.9821,
+      "regression_ok": 1,
+      "caught_by_upstream_tests": false,
+      "failed_tests": [
+        "src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) does not abort later checks unless abort: true is set"
+      ]
+    }
+  ]
+}

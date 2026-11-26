@@ -1,0 +1,122 @@
+{
+  "repo": "zod",
+  "strategy": "bug-injection",
+  "seed": 1,
+  "count_requested": 2,
+  "candidates_tried": 6,
+  "accepted": 2,
+  "funnel": {
+    "accepted": 2,
+    "rejected:undetected": 3,
+    "surplus": 1
+  },
+  "reference": {
+    "tests": 5545,
+    "stable_passing": 5545,
+    "flaky": 0
+  },
+  "thresholds": {
+    "min_kill_rate": 0.75,
+    "max_f2p_fraction": 0.25,
+    "adversarial_per_task": 4
+  },
+  "tasks": [
+    "zod-bug-foldobjects-ed4597",
+    "zod-bug-helperfn-be74f3"
+  ],
+  "elapsed_sec": 772.8,
+  "candidates": [
+    {
+      "index": 1,
+      "id": "zod-bug-foldobjects-ed4597",
+      "file": "packages/zod/src/v4/core/to-json-schema.ts",
+      "function": "foldObjects",
+      "line": 483,
+      "change": "`===` -> `!==`",
+      "f2p": 3,
+      "p2p": 5542,
+      "adversarial": {
+        "mutants": 4,
+        "killed": 3,
+        "kill_rate": 0.75,
+        "survivors": [
+          "1 -> 0 @ offset 22186"
+        ]
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 2,
+      "id": "zod-bug-lazymethod-65ab4d",
+      "file": "packages/zod/src/v4/classic/errors.ts",
+      "function": "_lazyMethod",
+      "line": 35,
+      "change": "`false` -> `true`",
+      "f2p": 0,
+      "p2p": 5545,
+      "status": "rejected",
+      "reason": "undetected"
+    },
+    {
+      "index": 3,
+      "id": "zod-bug-withchecks-d7804d",
+      "file": "packages/zod/src/v4/mini/in-out.ts",
+      "function": "withChecks",
+      "line": 11,
+      "change": "`true` -> `false`",
+      "f2p": 0,
+      "p2p": 5545,
+      "status": "rejected",
+      "reason": "undetected"
+    },
+    {
+      "index": 4,
+      "id": "zod-bug-helperfn-be74f3",
+      "file": "packages/zod/src/v4/core/compile.ts",
+      "function": "helperFn",
+      "line": 731,
+      "change": "`0` -> `1`",
+      "f2p": 5,
+      "p2p": 5540,
+      "adversarial": {
+        "mutants": 1,
+        "killed": 1,
+        "kill_rate": 1.0,
+        "survivors": []
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 5,
+      "id": "zod-bug-compile-905c48",
+      "file": "packages/zod/src/v4/core/doc.ts",
+      "function": "compile",
+      "line": 43,
+      "change": "`??` -> `||`",
+      "f2p": 0,
+      "p2p": 5545,
+      "status": "rejected",
+      "reason": "undetected"
+    },
+    {
+      "index": 6,
+      "id": "zod-bug-runchecks-74e57e",
+      "file": "packages/zod/src/v4/core/schemas.ts",
+      "function": "runChecks",
+      "line": 233,
+      "change": "removed `!`",
+      "f2p": 111,
+      "p2p": 5434,
+      "adversarial": {
+        "mutants": 4,
+        "killed": 3,
+        "kill_rate": 0.75,
+        "survivors": [
+          "?? -> || @ offset 8945"
+        ]
+      },
+      "status": "surplus",
+      "reason": "target count already reached"
+    }
+  ]
+}

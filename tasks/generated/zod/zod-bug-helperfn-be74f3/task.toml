@@ -1,0 +1,47 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/packages/zod/src" }]
+
+[task]
+name = "coding-task-factory/zod-bug-helperfn-be74f3"
+version = "1.0.0"
+description = "Fix a regression injected into helperFn (packages/zod/src/v4/core/compile.ts)"
+authors = []
+keywords = ["typescript", "zod", "bug-fix", "generated"]
+
+[metadata]
+generator = "bug-injection"
+seed = 1
+source_repo = "https://github.com/colinhacks/zod"
+source_commit = "d40c329910436e528d3c26cb1b9179e05abebf05"
+language = "typescript"
+file = "packages/zod/src/v4/core/compile.ts"
+function = "helperFn"
+line = 731
+change = "`0` -> `1`"
+f2p_tests = 5
+p2p_tests = 5540
+adversarial_mutants = 1
+adversarial_killed = 1
+difficulty = "medium"
+difficulty_explanation = "Single-token defect (`0` -> `1`) detected by 5 failing test(s); hint: failing tests only."
+category = "bug-fix"
+
+[verifier]
+timeout_sec = 900.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096

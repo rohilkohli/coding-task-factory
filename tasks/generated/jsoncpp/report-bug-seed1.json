@@ -1,0 +1,208 @@
+{
+  "repo": "jsoncpp",
+  "strategy": "bug-injection",
+  "seed": 1,
+  "count_requested": 3,
+  "candidates_tried": 12,
+  "accepted": 3,
+  "funnel": {
+    "accepted": 3,
+    "rejected:build-failure": 2,
+    "rejected:no-adversarial-sites": 2,
+    "rejected:undetected": 3,
+    "rejected:weak-tests": 1,
+    "surplus": 1
+  },
+  "reference": {
+    "tests": 340,
+    "stable_passing": 340,
+    "flaky": 0
+  },
+  "thresholds": {
+    "min_kill_rate": 0.75,
+    "max_f2p_fraction": 0.25,
+    "adversarial_per_task": 6
+  },
+  "tasks": [
+    "jsoncpp-bug-ourreader-decodestring-06c621",
+    "jsoncpp-bug-fastwriter-writevalue-be51db",
+    "jsoncpp-bug-value-czstring-operator-95f29e"
+  ],
+  "elapsed_sec": 292.2,
+  "candidates": [
+    {
+      "index": 1,
+      "id": "jsoncpp-bug-ourreader-parse-33ef3d",
+      "file": "src/lib_json/json_reader.cpp",
+      "function": "OurReader::parse",
+      "line": 1005,
+      "change": "`false` -> `true`",
+      "f2p": 0,
+      "p2p": 340,
+      "status": "rejected",
+      "reason": "undetected"
+    },
+    {
+      "index": 2,
+      "id": "jsoncpp-bug-value-isarray-80e2e0",
+      "file": "src/lib_json/json_value.cpp",
+      "function": "Value::isArray",
+      "line": 1501,
+      "change": "`==` -> `!=`",
+      "f2p": 14,
+      "p2p": 326,
+      "status": "rejected",
+      "reason": "no-adversarial-sites"
+    },
+    {
+      "index": 3,
+      "id": "jsoncpp-bug-ourreader-decodestring-06c621",
+      "file": "src/lib_json/json_reader.cpp",
+      "function": "OurReader::decodeString",
+      "line": 1692,
+      "change": "`false` -> `true`",
+      "f2p": 5,
+      "p2p": 335,
+      "adversarial": {
+        "mutants": 4,
+        "killed": 4,
+        "kill_rate": 1.0,
+        "survivors": []
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 4,
+      "id": "jsoncpp-bug-reader-pusherror-9ebe48",
+      "file": "src/lib_json/json_reader.cpp",
+      "function": "Reader::pushError",
+      "line": 814,
+      "change": "`||` -> `&&`",
+      "f2p": 0,
+      "p2p": 340,
+      "status": "rejected",
+      "reason": "undetected"
+    },
+    {
+      "index": 5,
+      "id": "jsoncpp-bug-builtstyledstreamwriter-writevalue-4ec410",
+      "file": "src/lib_json/json_writer.cpp",
+      "function": "BuiltStyledStreamWriter::writeValue",
+      "line": 883,
+      "change": "`-` -> `+`",
+      "status": "rejected",
+      "reason": "build-failure"
+    },
+    {
+      "index": 6,
+      "id": "jsoncpp-bug-fastwriter-writevalue-be51db",
+      "file": "src/lib_json/json_writer.cpp",
+      "function": "FastWriter::writeValue",
+      "line": 323,
+      "change": "`!=` -> `==`",
+      "f2p": 5,
+      "p2p": 335,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 6,
+        "kill_rate": 1.0,
+        "survivors": []
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 7,
+      "id": "jsoncpp-bug-value-czstring-operator-95f29e",
+      "file": "src/lib_json/json_value.cpp",
+      "function": "Value::CZString::operator==",
+      "line": 365,
+      "change": "removed `!`",
+      "f2p": 52,
+      "p2p": 288,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 5,
+        "kill_rate": 0.833,
+        "survivors": [
+          "&& -> || @ offset 12678"
+        ]
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 8,
+      "id": "jsoncpp-bug-ourreader-containsnewline-6cdc05",
+      "file": "src/lib_json/json_reader.cpp",
+      "function": "OurReader::containsNewLine",
+      "line": 997,
+      "change": "`==` -> `!=`",
+      "f2p": 0,
+      "p2p": 340,
+      "status": "rejected",
+      "reason": "undetected"
+    },
+    {
+      "index": 9,
+      "id": "jsoncpp-bug-value-find-60a887",
+      "file": "src/lib_json/json_value.cpp",
+      "function": "Value::find",
+      "line": 1167,
+      "change": "`+` -> `-`",
+      "f2p": 41,
+      "p2p": 299,
+      "status": "rejected",
+      "reason": "no-adversarial-sites"
+    },
+    {
+      "index": 10,
+      "id": "jsoncpp-bug-builtstyledstreamwriter-writecommentafte-6ce5fb",
+      "file": "src/lib_json/json_writer.cpp",
+      "function": "BuiltStyledStreamWriter::writeCommentAfterValueOnSameLine",
+      "line": 1076,
+      "change": "`+` -> `-`",
+      "status": "rejected",
+      "reason": "build-failure"
+    },
+    {
+      "index": 11,
+      "id": "jsoncpp-bug-value-isintegral-094f65",
+      "file": "src/lib_json/json_value.cpp",
+      "function": "Value::isIntegral",
+      "line": 1467,
+      "change": "`false` -> `true`",
+      "f2p": 5,
+      "p2p": 335,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 4,
+        "kill_rate": 0.667,
+        "survivors": [
+          "<= -> < @ offset 45444",
+          "&& -> || @ offset 45428"
+        ]
+      },
+      "status": "rejected",
+      "reason": "weak-tests"
+    },
+    {
+      "index": 12,
+      "id": "jsoncpp-bug-ourreader-getlocationlineandcolumn-e0d025",
+      "file": "src/lib_json/json_reader.cpp",
+      "function": "OurReader::getLocationLineAndColumn",
+      "line": 1845,
+      "change": "`==` -> `!=`",
+      "f2p": 1,
+      "p2p": 339,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 5,
+        "kill_rate": 0.833,
+        "survivors": [
+          "!= -> == @ offset 55017"
+        ]
+      },
+      "status": "surplus",
+      "reason": "target count already reached"
+    }
+  ]
+}

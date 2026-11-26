@@ -1,0 +1,58 @@
+hidden::test_custom_formats_are_stored
+hidden::test_custom_metavar_in_help
+hidden::test_datetime_argument_optional_metavar
+hidden::test_datetime_default_value
+hidden::test_datetime_info_dict
+hidden::test_datetime_option_custom
+hidden::test_datetime_option_default
+hidden::test_datetime_value_passes_through_unchanged
+hidden::test_default_formats_in_order
+hidden::test_exported_from_package_and_types_module
+hidden::test_first_matching_format_wins
+hidden::test_invalid_value_raises_bad_parameter
+hidden::test_later_format_used_when_earlier_ones_fail
+hidden::test_name_and_repr
+hidden::test_returns_datetime_instances
+hidden::test_single_format_error_uses_singular_wording
+hidden::test_space_separated_default_format
+tests.test_basic::test_datetime_argument_optional_metavar
+tests.test_basic::test_datetime_option_custom
+tests.test_basic::test_datetime_option_default
+tests.test_info_dict::test_argument_to_info_dict_nargs
+tests.test_info_dict::test_command[Command]
+tests.test_info_dict::test_command[Group]
+tests.test_info_dict::test_command[Nested Group]
+tests.test_info_dict::test_command_to_info_dict_multiple_arguments
+tests.test_info_dict::test_context
+tests.test_info_dict::test_param_to_info_dict_deprecated_help[custom-label-argument]
+tests.test_info_dict::test_param_to_info_dict_deprecated_help[custom-label-option]
+tests.test_info_dict::test_param_to_info_dict_deprecated_help[help-argument]
+tests.test_info_dict::test_param_to_info_dict_deprecated_help[help-option]
+tests.test_info_dict::test_param_to_info_dict_deprecated_help[no-help-argument]
+tests.test_info_dict::test_param_to_info_dict_deprecated_help[no-help-option]
+tests.test_info_dict::test_param_to_info_dict_help[None-argument]
+tests.test_info_dict::test_param_to_info_dict_help[None-option]
+tests.test_info_dict::test_param_to_info_dict_help[empty-argument]
+tests.test_info_dict::test_param_to_info_dict_help[empty-option]
+tests.test_info_dict::test_param_to_info_dict_help[multi-line-argument]
+tests.test_info_dict::test_param_to_info_dict_help[multi-line-option]
+tests.test_info_dict::test_param_to_info_dict_help[single-line-argument]
+tests.test_info_dict::test_param_to_info_dict_help[single-line-option]
+tests.test_info_dict::test_parameter[Argument]
+tests.test_info_dict::test_parameter[Bool ParamType]
+tests.test_info_dict::test_parameter[Choice ParamType]
+tests.test_info_dict::test_parameter[DateTime ParamType]
+tests.test_info_dict::test_parameter[FLOAT ParamType]
+tests.test_info_dict::test_parameter[File ParamType]
+tests.test_info_dict::test_parameter[Flag Option]
+tests.test_info_dict::test_parameter[FloatRange ParamType]
+tests.test_info_dict::test_parameter[Func ParamType]
+tests.test_info_dict::test_parameter[INT ParamType]
+tests.test_info_dict::test_parameter[IntRange ParamType]
+tests.test_info_dict::test_parameter[Option]
+tests.test_info_dict::test_parameter[Path ParamType]
+tests.test_info_dict::test_parameter[STRING ParamType]
+tests.test_info_dict::test_parameter[Tuple ParamType]
+tests.test_info_dict::test_parameter[UNPROCESSED ParamType]
+tests.test_info_dict::test_parameter[UUID ParamType]
+tests.test_info_dict::test_paramtype_no_name

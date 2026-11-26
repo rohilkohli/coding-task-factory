@@ -1,0 +1,22 @@
+--- a/src/lib_json/json_writer.cpp
++++ b/src/lib_json/json_writer.cpp
+@@ -4,6 +4,7 @@
+ // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
+ 
+ #if !defined(JSON_IS_AMALGAMATION)
++#include <stdexcept>
+ #include "json_tool.h"
+ #include <json/writer.h>
+ #endif // if !defined(JSON_IS_AMALGAMATION)
+@@ -1040,10 +1041,7 @@
+ }
+ 
+ void BuiltStyledStreamWriter::writeWithIndent(String const& value) {
+-  if (!indented_)
+-    writeIndent();
+-  *sout_ << value;
+-  indented_ = false;
++  throw std::logic_error("not implemented");
+ }
+ 
+ void BuiltStyledStreamWriter::indent() { indentString_ += indentation_; }

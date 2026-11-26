@@ -1,0 +1,41 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/packages/zod/src" }]
+
+[task]
+name = "coding-task-factory/zod-iban-format"
+version = "1.0.0"
+description = "Implement Zod's IBAN string format across core, classic, mini, JSON Schema and the compiler (feature-removal task)."
+authors = []
+keywords = ["typescript", "zod", "validation", "feature-implementation"]
+
+[metadata]
+generator = "feature-removal"
+source_repo = "https://github.com/colinhacks/zod"
+source_commit = "d40c329910436e528d3c26cb1b9179e05abebf05"
+language = "typescript"
+difficulty = "medium"
+difficulty_explanation = "Cross-cutting feature over 7 files and 3 API layers (core, classic, mini) plus JSON Schema import and the AOT compiler; needs a BigInt-free ISO 7064 mod-97 checksum and must keep 5,500+ tests and the type checker green."
+category = "feature-implementation"
+
+[verifier]
+timeout_sec = 900.0
+environment_mode = "separate"
+
+# Dedicated grading sandbox built from tests/Dockerfile. It receives only the
+# agent's packages/zod/src (see artifacts); test files inside it are replaced
+# with pristine upstream tests plus hidden tests before grading.
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096
+
+[agent]
+timeout_sec = 2700.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096

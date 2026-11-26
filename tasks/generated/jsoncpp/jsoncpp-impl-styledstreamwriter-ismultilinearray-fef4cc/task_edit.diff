@@ -1,0 +1,42 @@
+--- a/src/lib_json/json_writer.cpp
++++ b/src/lib_json/json_writer.cpp
+@@ -4,6 +4,7 @@
+ // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
+ 
+ #if !defined(JSON_IS_AMALGAMATION)
++#include <stdexcept>
+ #include "json_tool.h"
+ #include <json/writer.h>
+ #endif // if !defined(JSON_IS_AMALGAMATION)
+@@ -714,30 +715,7 @@
+ }
+ 
+ bool StyledStreamWriter::isMultilineArray(const Value& value) {
+-  ArrayIndex const size = value.size();
+-  bool isMultiLine = size * 3 >= rightMargin_;
+-  childValues_.clear();
+-  for (ArrayIndex index = 0; index < size && !isMultiLine; ++index) {
+-    const Value& childValue = value[index];
+-    isMultiLine = ((childValue.isArray() || childValue.isObject()) &&
+-                   !childValue.empty());
+-  }
+-  if (!isMultiLine) // check if line length > max line length
+-  {
+-    childValues_.reserve(size);
+-    addChildValues_ = true;
+-    ArrayIndex lineLength = 4 + (size - 1) * 2; // '[ ' + ', '*n + ' ]'
+-    for (ArrayIndex index = 0; index < size; ++index) {
+-      if (hasCommentForValue(value[index])) {
+-        isMultiLine = true;
+-      }
+-      writeValue(value[index]);
+-      lineLength += static_cast<ArrayIndex>(childValues_[index].length());
+-    }
+-    addChildValues_ = false;
+-    isMultiLine = isMultiLine || lineLength >= rightMargin_;
+-  }
+-  return isMultiLine;
++  throw std::logic_error("not implemented");
+ }
+ 
+ void StyledStreamWriter::pushValue(const String& value) {

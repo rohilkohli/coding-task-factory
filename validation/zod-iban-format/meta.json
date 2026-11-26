@@ -1,0 +1,7 @@
+{
+  "upstream_tests": [
+    "src/v4/classic/tests/iban.test.ts >",
+    "src/v4/mini/tests/string.test.ts > z.iban",
+    "src/v4/mini/tests/string.test.ts > src/v4/mini/tests/string.test.ts z.iban"
+  ]
+}

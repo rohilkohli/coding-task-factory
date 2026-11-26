@@ -1,0 +1,47 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/src/lib_json" }, { source = "/app/include" }]
+
+[task]
+name = "coding-task-factory/jsoncpp-bug-value-czstring-operator-95f29e"
+version = "1.0.0"
+description = "Fix a regression injected into Value::CZString::operator== (src/lib_json/json_value.cpp)"
+authors = []
+keywords = ["cpp", "jsoncpp", "bug-fix", "generated"]
+
+[metadata]
+generator = "bug-injection"
+seed = 1
+source_repo = "https://github.com/open-source-parsers/jsoncpp"
+source_commit = "93acc7b155048f1a66c43235cc205519f1e7a6ea"
+language = "cpp"
+file = "src/lib_json/json_value.cpp"
+function = "Value::CZString::operator=="
+line = 365
+change = "removed `!`"
+f2p_tests = 52
+p2p_tests = 288
+adversarial_mutants = 6
+adversarial_killed = 5
+difficulty = "easy"
+difficulty_explanation = "Single-token defect (removed `!`) detected by 52 failing test(s); hint: failing tests only."
+category = "bug-fix"
+
+[verifier]
+timeout_sec = 900.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096

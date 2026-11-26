@@ -1,0 +1,21 @@
+src/v4/classic/tests/codec-examples.test.ts > codec transform error handling
+src/v4/classic/tests/preprocess.test.ts > async preprocess ctx.addIssue with parseAsync
+src/v4/classic/tests/preprocess.test.ts > ctx.addIssue accepts string
+src/v4/classic/tests/preprocess.test.ts > preprocess ctx.addIssue fatal by default
+src/v4/classic/tests/preprocess.test.ts > preprocess ctx.addIssue fatal true
+src/v4/classic/tests/preprocess.test.ts > preprocess ctx.addIssue with parse
+src/v4/classic/tests/preprocess.test.ts > z.NEVER in preprocess
+src/v4/classic/tests/stringbool.test.ts > custom values
+src/v4/classic/tests/stringbool.test.ts > custom values - case sensitive
+src/v4/classic/tests/stringbool.test.ts > z.stringbool
+src/v4/classic/tests/stringbool.test.ts > z.stringbool with custom error messages
+src/v4/classic/tests/transform.test.ts > a path reused across parses isn't prefixed in place
+src/v4/classic/tests/transform.test.ts > do not continue by default
+src/v4/classic/tests/transform.test.ts > transform context should have addIssue
+src/v4/classic/tests/transform.test.ts > transform ctx.addIssue with parse
+src/v4/classic/tests/transform.test.ts > transform ctx.addIssue with parseAsync
+src/v4/classic/tests/transform.test.ts > z.NEVER in transform
+src/v4/core/tests/compile-differential.test.ts > codec stringbool
+src/v4/core/tests/compile.test.ts > transform with validation
+src/v4/mini/tests/index.test.ts > a path reused across parses isn't prefixed in place
+src/v4/mini/tests/index.test.ts > z.stringbool

@@ -1,0 +1,202 @@
+{
+  "repo": "click",
+  "strategy": "bug-injection",
+  "seed": 1,
+  "count_requested": 3,
+  "candidates_tried": 11,
+  "accepted": 3,
+  "funnel": {
+    "accepted": 3,
+    "rejected:hangs": 1,
+    "rejected:no-adversarial-sites": 1,
+    "rejected:undetected": 3,
+    "rejected:weak-tests": 1,
+    "surplus": 2
+  },
+  "reference": {
+    "tests": 2652,
+    "stable_passing": 2603,
+    "flaky": 0
+  },
+  "thresholds": {
+    "min_kill_rate": 0.75,
+    "max_f2p_fraction": 0.25,
+    "adversarial_per_task": 6
+  },
+  "tasks": [
+    "click-bug-usageerror-show-eecb2f",
+    "click-bug-make-default-short-help-751aba",
+    "click-bug-argument-process-ed152e"
+  ],
+  "elapsed_sec": 0.8,
+  "candidates": [
+    {
+      "index": 1,
+      "id": "click-bug-usageerror-show-eecb2f",
+      "file": "src/click/exceptions.py",
+      "function": "UsageError.show",
+      "line": 87,
+      "change": "`is not` -> `is`",
+      "f2p": 37,
+      "p2p": 2566,
+      "adversarial": {
+        "mutants": 4,
+        "killed": 4,
+        "kill_rate": 1.0,
+        "survivors": []
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 2,
+      "id": "click-bug-version-option-8a0880",
+      "file": "src/click/decorators.py",
+      "function": "version_option",
+      "line": 417,
+      "change": "`False` -> `True`",
+      "f2p": 0,
+      "p2p": 2603,
+      "status": "rejected",
+      "reason": "undetected"
+    },
+    {
+      "index": 3,
+      "id": "click-bug-progressbar-make-step-136663",
+      "file": "src/click/_termui_impl.py",
+      "function": "ProgressBar.make_step",
+      "line": 296,
+      "change": "`and` -> `or`",
+      "f2p": 2,
+      "p2p": 2601,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 4,
+        "kill_rate": 0.667,
+        "survivors": [
+          "6 -> 7 @ offset 9936",
+          "6 -> 5 @ offset 9936"
+        ]
+      },
+      "status": "rejected",
+      "reason": "weak-tests"
+    },
+    {
+      "index": 4,
+      "id": "click-bug-make-default-short-help-751aba",
+      "file": "src/click/utils.py",
+      "function": "_make_default_short_help",
+      "line": 58,
+      "change": "`and` -> `or`",
+      "f2p": 31,
+      "p2p": 2572,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 6,
+        "kill_rate": 1.0,
+        "survivors": []
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 5,
+      "id": "click-bug-namedtextiowrapper-init-0154af",
+      "file": "src/click/testing.py",
+      "function": "_NamedTextIOWrapper.__init__",
+      "line": 196,
+      "change": "`1` -> `2`",
+      "f2p": 0,
+      "p2p": 2603,
+      "status": "rejected",
+      "reason": "undetected"
+    },
+    {
+      "index": 6,
+      "id": "click-bug-argument-process-ed152e",
+      "file": "src/click/parser.py",
+      "function": "_Argument.process",
+      "line": 191,
+      "change": "`0` -> `1`",
+      "f2p": 8,
+      "p2p": 2595,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 6,
+        "kill_rate": 1.0,
+        "survivors": []
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 7,
+      "id": "click-bug-noargsishelperror-show-8ee702",
+      "file": "src/click/exceptions.py",
+      "function": "NoArgsIsHelpError.show",
+      "line": 338,
+      "change": "`True` -> `False`",
+      "f2p": 0,
+      "p2p": 2603,
+      "status": "rejected",
+      "reason": "undetected"
+    },
+    {
+      "index": 8,
+      "id": "click-bug-textwrapper-wrap-chunks-a3ea84",
+      "file": "src/click/_textwrap.py",
+      "function": "TextWrapper._wrap_chunks",
+      "line": 20,
+      "change": "`-` -> `+`",
+      "f2p": 7,
+      "p2p": 2596,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 6,
+        "kill_rate": 1.0,
+        "survivors": []
+      },
+      "status": "surplus",
+      "reason": "target count already reached"
+    },
+    {
+      "index": 9,
+      "id": "click-bug-make-pass-decorator-locals-decorator-loc-43e4eb",
+      "file": "src/click/decorators.py",
+      "function": "make_pass_decorator.<locals>.decorator.<locals>.new_func",
+      "line": 73,
+      "change": "`is` -> `is not`",
+      "f2p": 5,
+      "p2p": 2598,
+      "status": "rejected",
+      "reason": "no-adversarial-sites"
+    },
+    {
+      "index": 10,
+      "id": "click-bug-parameter-resolve-envvar-value-3bc00a",
+      "file": "src/click/core.py",
+      "function": "Parameter.resolve_envvar_value",
+      "line": 2852,
+      "change": "removed `not`",
+      "status": "rejected",
+      "reason": "hangs"
+    },
+    {
+      "index": 11,
+      "id": "click-bug-resolve-context-958a00",
+      "file": "src/click/shell_completion.py",
+      "function": "_resolve_context",
+      "line": 691,
+      "change": "`+` -> `-`",
+      "f2p": 47,
+      "p2p": 2556,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 5,
+        "kill_rate": 0.833,
+        "survivors": [
+          "True -> False @ offset 23664"
+        ]
+      },
+      "status": "surplus",
+      "reason": "target count already reached"
+    }
+  ]
+}

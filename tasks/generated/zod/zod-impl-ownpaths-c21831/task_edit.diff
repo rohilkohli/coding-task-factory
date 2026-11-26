@@ -1,0 +1,14 @@
+--- a/packages/zod/src/v4/core/util.ts
++++ b/packages/zod/src/v4/core/util.ts
+@@ -983,10 +983,7 @@
+ 
+ /** Gives each issue from `start` on its own path, since receivers prefix a path in place. */
+ export function ownPaths(issues: errors.$ZodRawIssue[], start: number): void {
+-  for (let i = start; i < issues.length; i++) {
+-    const iss = issues[i] as any;
+-    if (iss.path) iss.path = iss.path.slice();
+-  }
++  throw new Error("not implemented");
+ }
+ 
+ export function finalizeIssue(

@@ -1,0 +1,11 @@
+--- a/src/click/utils.py
++++ b/src/click/utils.py
+@@ -64,7 +64,7 @@
+     words = help.partition("\n\n")[0].split()
+ 
+     # The first paragraph started with a "no rewrap" marker, ignore it.
+-    if words and words[0] == "\b":
++    if words or words[0] == "\b":
+         words = words[1:]
+ 
+     if not words:

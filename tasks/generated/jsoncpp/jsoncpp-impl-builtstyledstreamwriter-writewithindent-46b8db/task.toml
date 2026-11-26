@@ -1,0 +1,47 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/src/lib_json" }, { source = "/app/include" }]
+
+[task]
+name = "coding-task-factory/jsoncpp-impl-builtstyledstreamwriter-writewithindent-46b8db"
+version = "1.0.0"
+description = "Re-implement BuiltStyledStreamWriter::writeWithIndent (src/lib_json/json_writer.cpp)"
+authors = []
+keywords = ["cpp", "jsoncpp", "feature-implementation", "generated"]
+
+[metadata]
+generator = "function-removal"
+seed = 1
+source_repo = "https://github.com/open-source-parsers/jsoncpp"
+source_commit = "93acc7b155048f1a66c43235cc205519f1e7a6ea"
+language = "cpp"
+file = "src/lib_json/json_writer.cpp"
+function = "BuiltStyledStreamWriter::writeWithIndent"
+line = 1042
+change = "body removed (4 lines)"
+f2p_tests = 28
+p2p_tests = 312
+adversarial_mutants = 2
+adversarial_killed = 2
+difficulty = "easy"
+difficulty_explanation = "Re-implement a 4-line function body from its signature, docs and call sites."
+category = "feature-implementation"
+
+[verifier]
+timeout_sec = 900.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096

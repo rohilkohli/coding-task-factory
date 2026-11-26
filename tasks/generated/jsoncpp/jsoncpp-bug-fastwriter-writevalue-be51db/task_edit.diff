@@ -1,0 +1,11 @@
+--- a/src/lib_json/json_writer.cpp
++++ b/src/lib_json/json_writer.cpp
+@@ -362,7 +362,7 @@
+     document_ += '{';
+     for (auto it = members.begin(); it != members.end(); ++it) {
+       const String& name = *it;
+-      if (it != members.begin())
++      if (it == members.begin())
+         document_ += ',';
+       document_ += valueToQuotedStringN(name.data(), name.length());
+       document_ += yamlCompatibilityEnabled_ ? ": " : ":";

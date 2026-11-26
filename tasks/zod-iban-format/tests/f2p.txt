@@ -1,0 +1,56 @@
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) JSON Schema export and import keep the IBAN semantics
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) compiled schemas enforce the checksum
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) composes with optional and inside objects
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) core isValidIBAN checks shape and mod-97 checksum
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) creates a string-format schema with format 'iban'
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) does not abort later checks unless abort: true is set
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) enforces the 15-34 length bounds even when the checksum is valid
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) is exported from classic, mini and core
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) letters in the BBAN take part in the checksum
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) regexes.iban describes the shape only
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) rejects non-string input as invalid_type
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) reports an invalid_format issue with format 'iban'
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) supports custom error messages
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) works as a check on z.string()
+src/v4/classic/tests/iban-extra.test.ts > src/v4/classic/tests/iban-extra.test.ts z.iban (extended) zod/mini enforces shape and checksum
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) JSON Schema export and import keep the IBAN semantics
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) compiled schemas enforce the checksum
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) composes with optional and inside objects
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) core isValidIBAN checks shape and mod-97 checksum
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) creates a string-format schema with format 'iban'
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) does not abort later checks unless abort: true is set
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) enforces the 15-34 length bounds even when the checksum is valid
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) is exported from classic, mini and core
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) letters in the BBAN take part in the checksum
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) regexes.iban describes the shape only
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) rejects non-string input as invalid_type
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) reports an invalid_format issue with format 'iban'
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) supports custom error messages
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) works as a check on z.string()
+src/v4/classic/tests/iban-extra.test.ts > z.iban (extended) zod/mini enforces shape and checksum
+src/v4/classic/tests/iban.test.ts > src/v4/classic/tests/iban.test.ts z.iban accepts %s
+src/v4/classic/tests/iban.test.ts > src/v4/classic/tests/iban.test.ts z.iban carries the shape regex as its JSON Schema pattern
+src/v4/classic/tests/iban.test.ts > src/v4/classic/tests/iban.test.ts z.iban error message references IBAN
+src/v4/classic/tests/iban.test.ts > src/v4/classic/tests/iban.test.ts z.iban rejects check digits outside 02-98
+src/v4/classic/tests/iban.test.ts > src/v4/classic/tests/iban.test.ts z.iban rejects inputs outside length bounds (15-34)
+src/v4/classic/tests/iban.test.ts > src/v4/classic/tests/iban.test.ts z.iban rejects invalid check digits (checksum failure)
+src/v4/classic/tests/iban.test.ts > src/v4/classic/tests/iban.test.ts z.iban rejects lowercase characters
+src/v4/classic/tests/iban.test.ts > src/v4/classic/tests/iban.test.ts z.iban rejects spaces and hyphens
+src/v4/classic/tests/iban.test.ts > src/v4/classic/tests/iban.test.ts z.iban rejects special characters
+src/v4/classic/tests/iban.test.ts > src/v4/classic/tests/iban.test.ts z.iban round-trips through JSON Schema with the checksum intact
+src/v4/classic/tests/iban.test.ts > z.iban accepts Belgium (16)
+src/v4/classic/tests/iban.test.ts > z.iban accepts Cyprus (28)
+src/v4/classic/tests/iban.test.ts > z.iban accepts France (27)
+src/v4/classic/tests/iban.test.ts > z.iban accepts Germany (22)
+src/v4/classic/tests/iban.test.ts > z.iban accepts Great Britain (22)
+src/v4/classic/tests/iban.test.ts > z.iban accepts Malta (31)
+src/v4/classic/tests/iban.test.ts > z.iban accepts Maximum length (34)
+src/v4/classic/tests/iban.test.ts > z.iban accepts Maximum length mixed (34)
+src/v4/classic/tests/iban.test.ts > z.iban accepts Netherlands (18)
+src/v4/classic/tests/iban.test.ts > z.iban accepts Norway (15, minimum)
+src/v4/classic/tests/iban.test.ts > z.iban accepts Turkey (26)
+src/v4/classic/tests/iban.test.ts > z.iban carries the shape regex as its JSON Schema pattern
+src/v4/classic/tests/iban.test.ts > z.iban error message references IBAN
+src/v4/classic/tests/iban.test.ts > z.iban round-trips through JSON Schema with the checksum intact
+src/v4/mini/tests/string.test.ts > src/v4/mini/tests/string.test.ts z.iban
+src/v4/mini/tests/string.test.ts > z.iban

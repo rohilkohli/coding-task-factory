@@ -1,0 +1,36 @@
+{
+  "tasks": 6,
+  "passed": 6,
+  "results": {
+    "click-bug-argument-process-ed152e": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "click-bug-make-default-short-help-751aba": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "click-bug-usageerror-show-eecb2f": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "click-impl-build-prompt-c47ac0": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "click-impl-nosuchoption-format-message-b25755": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "click-impl-optionparser-match-long-opt-c4815f": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    }
+  }
+}

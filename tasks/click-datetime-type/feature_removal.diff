@@ -1,0 +1,184 @@
+diff --git a/src/click/__init__.py b/src/click/__init__.py
+index a34ab02..916f682 100644
+--- a/src/click/__init__.py
++++ b/src/click/__init__.py
+@@ -55,7 +55,6 @@ from .termui import style as style
+ from .termui import unstyle as unstyle
+ from .types import BOOL as BOOL
+ from .types import Choice as Choice
+-from .types import DateTime as DateTime
+ from .types import File as File
+ from .types import FLOAT as FLOAT
+ from .types import FloatRange as FloatRange
+diff --git a/src/click/types.py b/src/click/types.py
+index 5d11e9f..3fbdd1b 100644
+--- a/src/click/types.py
++++ b/src/click/types.py
+@@ -8,7 +8,6 @@ import stat
+ import sys
+ import typing as t
+ import uuid
+-from datetime import datetime
+ from gettext import gettext as _
+ from gettext import ngettext
+ 
+@@ -497,81 +496,6 @@ class Choice(ParamType[_ValueT_co], t.Generic[_ValueT_co]):
+         return [CompletionItem(c) for c in matched]
+ 
+ 
+-class DateTimeInfoDict(ParamTypeInfoDict):
+-    formats: cabc.Sequence[str]
+-
+-
+-class DateTime(ParamType[datetime]):
+-    """The DateTime type converts date strings into `datetime` objects.
+-
+-    The format strings which are checked are configurable, but default to some
+-    common (non-timezone aware) ISO 8601 formats.
+-
+-    When specifying *DateTime* formats, you should only pass a list or a tuple.
+-    Other iterables, like generators, may lead to surprising results.
+-
+-    The format strings are processed using ``datetime.strptime``, and this
+-    consequently defines the format strings which are allowed.
+-
+-    Parsing is tried using each format, in order, and the first format which
+-    parses successfully is used.
+-
+-    :param formats: A list or tuple of date format strings, in the order in
+-                    which they should be tried. Defaults to
+-                    ``'%Y-%m-%d'``, ``'%Y-%m-%dT%H:%M:%S'``,
+-                    ``'%Y-%m-%d %H:%M:%S'``.
+-    """
+-
+-    name = "datetime"
+-
+-    formats: cabc.Sequence[str]
+-
+-    def __init__(self, formats: cabc.Sequence[str] | None = None):
+-        self.formats = formats or [
+-            "%Y-%m-%d",
+-            "%Y-%m-%dT%H:%M:%S",
+-            "%Y-%m-%d %H:%M:%S",
+-        ]
+-
+-    def to_info_dict(self) -> DateTimeInfoDict:
+-        return {"formats": self.formats, **super().to_info_dict()}
+-
+-    def get_metavar(self, param: Parameter, ctx: Context) -> str:
+-        return f"[{'|'.join(self.formats)}]"
+-
+-    def _try_to_convert_date(self, value: t.Any, format: str) -> datetime | None:
+-        try:
+-            return datetime.strptime(value, format)
+-        except ValueError:
+-            return None
+-
+-    def convert(
+-        self, value: t.Any, param: Parameter | None, ctx: Context | None
+-    ) -> datetime:
+-        if isinstance(value, datetime):
+-            return value
+-
+-        for format in self.formats:
+-            converted = self._try_to_convert_date(value, format)
+-
+-            if converted is not None:
+-                return converted
+-
+-        formats_str = ", ".join(map(repr, self.formats))
+-        self.fail(
+-            ngettext(
+-                "{value!r} does not match the format {format}.",
+-                "{value!r} does not match the formats {formats}.",
+-                len(self.formats),
+-            ).format(value=value, format=formats_str, formats=formats_str),
+-            param,
+-            ctx,
+-        )
+-
+-    def __repr__(self) -> str:
+-        return "DateTime"
+-
+-
+ class _NumberParamTypeBase(
+     ParamType[_ValueT_co], t.Generic[_ValueT_contra, _ValueT_co]
+ ):
+diff --git a/tests/test_basic.py b/tests/test_basic.py
+index 1a98d9c..f719aa4 100644
+--- a/tests/test_basic.py
++++ b/tests/test_basic.py
+@@ -667,57 +667,6 @@ def test_choice_argument_optional_metavar(runner):
+     assert "[[foo|bar|baz]]" not in optional
+ 
+ 
+-def test_datetime_argument_optional_metavar(runner):
+-    """``DateTime`` arguments behave the same way as ``Choice``."""
+-
+-    @click.command()
+-    @click.argument("when", type=click.DateTime(formats=["%Y-%m-%d"]), required=False)
+-    def cli(when):
+-        pass
+-
+-    result = runner.invoke(cli, ["--help"])
+-    assert "Usage: cli [OPTIONS] [%Y-%m-%d]\n" in result.output
+-    assert "[[%Y-%m-%d]]" not in result.output
+-
+-
+-def test_datetime_option_default(runner):
+-    @click.command()
+-    @click.option("--start_date", type=click.DateTime())
+-    def cli(start_date):
+-        click.echo(start_date.strftime("%Y-%m-%dT%H:%M:%S"))
+-
+-    result = runner.invoke(cli, ["--start_date=2015-09-29"])
+-    assert not result.exception
+-    assert result.output == "2015-09-29T00:00:00\n"
+-
+-    result = runner.invoke(cli, ["--start_date=2015-09-29T09:11:22"])
+-    assert not result.exception
+-    assert result.output == "2015-09-29T09:11:22\n"
+-
+-    result = runner.invoke(cli, ["--start_date=2015-09"])
+-    assert result.exit_code == 2
+-    assert (
+-        "Invalid value for '--start_date': '2015-09' does not match the formats"
+-        " '%Y-%m-%d', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d %H:%M:%S'."
+-    ) in result.output
+-
+-    result = runner.invoke(cli, ["--help"])
+-    assert (
+-        "--start_date [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]" in result.output
+-    )
+-
+-
+-def test_datetime_option_custom(runner):
+-    @click.command()
+-    @click.option("--start_date", type=click.DateTime(formats=["%A %B %d, %Y"]))
+-    def cli(start_date):
+-        click.echo(start_date.strftime("%Y-%m-%dT%H:%M:%S"))
+-
+-    result = runner.invoke(cli, ["--start_date=Wednesday June 05, 2010"])
+-    assert not result.exception
+-    assert result.output == "2010-06-05T00:00:00\n"
+-
+-
+ def test_required_option(runner):
+     @click.command()
+     @click.option("--foo", required=True)
+diff --git a/tests/test_info_dict.py b/tests/test_info_dict.py
+index 58babcc..c2c1997 100644
+--- a/tests/test_info_dict.py
++++ b/tests/test_info_dict.py
+@@ -116,11 +116,6 @@ HELLO_GROUP = (
+             },
+             id="Choice ParamType",
+         ),
+-        pytest.param(
+-            click.DateTime(["%Y-%m-%d"]),
+-            {"param_type": "DateTime", "name": "datetime", "formats": ["%Y-%m-%d"]},
+-            id="DateTime ParamType",
+-        ),
+         pytest.param(*INT_PARAM_TYPE, id="INT ParamType"),
+         pytest.param(
+             click.IntRange(0, 10, clamp=True),

@@ -1,0 +1,47 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/packages/zod/src" }]
+
+[task]
+name = "coding-task-factory/zod-impl-run-e275bb"
+version = "1.0.0"
+description = "Re-implement run (packages/zod/src/v4/core/visit.ts)"
+authors = []
+keywords = ["typescript", "zod", "feature-implementation", "generated"]
+
+[metadata]
+generator = "function-removal"
+seed = 1
+source_repo = "https://github.com/colinhacks/zod"
+source_commit = "d40c329910436e528d3c26cb1b9179e05abebf05"
+language = "typescript"
+file = "packages/zod/src/v4/core/visit.ts"
+function = "run"
+line = 42
+change = "body removed (13 lines)"
+f2p_tests = 57
+p2p_tests = 5488
+adversarial_mutants = 3
+adversarial_killed = 3
+difficulty = "medium"
+difficulty_explanation = "Re-implement a 13-line function body from its signature, docs and call sites."
+category = "feature-implementation"
+
+[verifier]
+timeout_sec = 900.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096

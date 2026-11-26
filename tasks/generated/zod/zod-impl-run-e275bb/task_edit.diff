@@ -1,0 +1,24 @@
+--- a/packages/zod/src/v4/core/visit.ts
++++ b/packages/zod/src/v4/core/visit.ts
+@@ -40,20 +40,7 @@
+   const cache = new Map<AnyZod, AnyZod | Resolving>();
+ 
+   function run(s: AnyZod): AnyZod {
+-    const cached = cache.get(s);
+-    if (cached === RESOLVING) {
+-      // Non-lazy cycle. Defer to parse time, when the cache holds the finished node.
+-      return new schemas.$ZodLazy({
+-        type: "lazy",
+-        getter: () => cache.get(s) as AnyZod,
+-      });
+-    }
+-    if (cached !== undefined) return cached;
+-    cache.set(s, RESOLVING);
+-    const inner = mapInner(s);
+-    const mapped = fn(inner, inner !== s);
+-    cache.set(s, mapped);
+-    return mapped;
++    throw new Error("not implemented");
+   }
+ 
+   function mapInner(s: AnyZod): AnyZod {

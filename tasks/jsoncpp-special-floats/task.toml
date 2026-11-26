@@ -1,0 +1,40 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/src/lib_json" }, { source = "/app/include" }]
+
+[task]
+name = "coding-task-factory/jsoncpp-special-floats"
+version = "1.0.0"
+description = "Add the allowSpecialFloats reader setting (NaN/Infinity tokens) to JsonCpp's CharReaderBuilder (feature-removal task)."
+authors = []
+keywords = ["cpp", "jsoncpp", "parser", "feature-implementation"]
+
+[metadata]
+generator = "feature-removal"
+source_repo = "https://github.com/open-source-parsers/jsoncpp"
+source_commit = "93acc7b155048f1a66c43235cc205519f1e7a6ea"
+language = "cpp"
+difficulty = "medium"
+difficulty_explanation = "Touches the reader's feature flags, token enum, tokenizer (sign handling shared with number parsing), value decoding with offsets, and settings plumbing in four places; exact error behaviour and offsets must match, and the hand-written tokenizer is easy to break for ordinary negative numbers."
+category = "feature-implementation"
+
+[verifier]
+timeout_sec = 900.0
+environment_mode = "separate"
+
+# Dedicated grading sandbox built from tests/Dockerfile. It receives only the
+# agent's src/lib_json and include/ (see artifacts); all test sources are pristine.
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096
+
+[agent]
+timeout_sec = 2700.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096

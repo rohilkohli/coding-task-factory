@@ -1,0 +1,57 @@
+src/v4/classic/tests/deep-partial.test.ts > deepPartial 3-level deep nesting
+src/v4/classic/tests/deep-partial.test.ts > deepPartial ZodCodec: both sides recursed; preserved as ZodCodec (not degraded to ZodPipe)
+src/v4/classic/tests/deep-partial.test.ts > deepPartial ZodPreprocess: inner is recursed; preserved as ZodPreprocess (not degraded to ZodPipe)
+src/v4/classic/tests/deep-partial.test.ts > deepPartial ZodPromise: inner is recursed
+src/v4/classic/tests/deep-partial.test.ts > deepPartial ZodSuccess: inner is recursed
+src/v4/classic/tests/deep-partial.test.ts > deepPartial catchall value schema is recursed; strict/loose catchalls are preserved
+src/v4/classic/tests/deep-partial.test.ts > deepPartial discriminated union nested inside an array degrades and still matches
+src/v4/classic/tests/deep-partial.test.ts > deepPartial discriminated union: degrades to plain union (discriminator becomes optional)
+src/v4/classic/tests/deep-partial.test.ts > deepPartial does not mutate the source schema
+src/v4/classic/tests/deep-partial.test.ts > deepPartial intersection
+src/v4/classic/tests/deep-partial.test.ts > deepPartial intersection: both sides are deep-partialed independently
+src/v4/classic/tests/deep-partial.test.ts > deepPartial keyof preserved on output type
+src/v4/classic/tests/deep-partial.test.ts > deepPartial makes nested object optional at every level
+src/v4/classic/tests/deep-partial.test.ts > deepPartial makes shallow object optional
+src/v4/classic/tests/deep-partial.test.ts > deepPartial pipe input and output are both recursed
+src/v4/classic/tests/deep-partial.test.ts > deepPartial preserves ZodArray / ZodTuple / ZodUnion wrappers
+src/v4/classic/tests/deep-partial.test.ts > deepPartial preserves ZodObject structural type; `.shape` is accessible
+src/v4/classic/tests/deep-partial.test.ts > deepPartial preserves primitives at leaves
+src/v4/classic/tests/deep-partial.test.ts > deepPartial record / map / set value schemas are recursed
+src/v4/classic/tests/deep-partial.test.ts > deepPartial recurses through arrays
+src/v4/classic/tests/deep-partial.test.ts > deepPartial recurses through optional/nullable wrappers
+src/v4/classic/tests/deep-partial.test.ts > deepPartial recurses through tuples and rest
+src/v4/classic/tests/deep-partial.test.ts > deepPartial recurses through unions
+src/v4/classic/tests/deep-partial.test.ts > deepPartial recursive self-reference (via getter) is typeable (no TS depth explosion)
+src/v4/classic/tests/deep-partial.test.ts > deepPartial terminates on recursive (lazy) schemas
+src/v4/classic/tests/deep-partial.test.ts > deepPartial transform standalone is left untouched
+src/v4/classic/tests/deep-partial.test.ts > deepPartial tuple elements stay required — only *objects inside* become partial
+src/v4/classic/tests/deep-partial.test.ts > deepPartial wrapper composition (optional + default + readonly)
+src/v4/classic/tests/deep-partial.test.ts > visit (internal) an already-resolved lazy is still rewritten
+src/v4/classic/tests/deep-partial.test.ts > visit (internal) callback: can target a specific def.type
+src/v4/classic/tests/deep-partial.test.ts > visit (internal) catchall is traversed like tuple rest
+src/v4/classic/tests/deep-partial.test.ts > visit (internal) empty handler map returns the input schema unchanged
+src/v4/classic/tests/deep-partial.test.ts > visit (internal) handler map: dispatches by kind; unhandled kinds pass through
+src/v4/classic/tests/deep-partial.test.ts > visit (internal) identity callback returns the input schema unchanged
+src/v4/classic/tests/deep-partial.test.ts > visit (internal) non-lazy (getter) cycle resolves through the cache instead of throwing
+src/v4/classic/tests/deep-partial.test.ts > visit (internal) only nodes touched by a handler are re-cloned; siblings keep identity
+src/v4/classic/tests/deep-partial.test.ts > visit (internal) root is cached: lazy self-reference does not re-invoke fn at parse-time
+src/v4/classic/tests/deep-partial.test.ts > visit (internal) unknown def.type falls through unchanged (handler map form)
+src/v4/classic/tests/deep-partial.test.ts > visit (internal) visits shared sub-schemas only once
+src/v4/classic/tests/in-out.test.ts > z.input / z.output a wrapper over a pipe-free schema keeps both its value and its identity
+src/v4/classic/tests/in-out.test.ts > z.input / z.output a wrapper's stored value survives only on the side it belongs to
+src/v4/classic/tests/in-out.test.ts > z.input / z.output codec nested in object: output works recursively (regression #5224)
+src/v4/classic/tests/in-out.test.ts > z.input / z.output flat codec: input/output give the right side
+src/v4/classic/tests/in-out.test.ts > z.input / z.output nested across record / map: matches the use case in #5224
+src/v4/classic/tests/in-out.test.ts > z.input / z.output runtime `z.input` agrees with type-level `z.input<T>`
+src/v4/classic/tests/in-out.test.ts > z.input / z.output schema without pipes is returned with identity (no clone)
+src/v4/classic/tests/in-out.test.ts > z.input / z.output z.input drops a pipe's checks, which constrain a value the input side never produces
+src/v4/classic/tests/in-out.test.ts > z.input / z.output z.input resolves past a preprocess transform, which is not a real input side
+src/v4/classic/tests/in-out.test.ts > z.input / z.output z.output carries checks attached to a pipe
+src/v4/mini/tests/codec.test.ts > a wrapper's stored value survives only on the side it belongs to
+src/v4/mini/tests/codec.test.ts > z.input resolves past a transform piped into a schema
+src/v4/mini/tests/codec.test.ts > z.output carries checks attached to a pipe
+src/v4/mini/tests/deep-partial.test.ts > mini deepPartial ZodMiniCodec preserved through deepPartial
+src/v4/mini/tests/deep-partial.test.ts > mini deepPartial makes a ZodMiniObject's fields optional recursively
+src/v4/mini/tests/deep-partial.test.ts > mini deepPartial preserves ZodMiniObject structural type (shape accessible)
+src/v4/mini/tests/deep-partial.test.ts > mini deepPartial recursive getter-based object is typeable
+src/v4/mini/tests/deep-partial.test.ts > mini deepPartial tuple elements stay required

@@ -1,0 +1,26 @@
+{
+  "tasks": 4,
+  "passed": 4,
+  "results": {
+    "zod-bug-foldobjects-ed4597": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "zod-bug-helperfn-be74f3": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "zod-impl-ownpaths-c21831": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "zod-impl-run-e275bb": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    }
+  }
+}

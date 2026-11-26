@@ -1,0 +1,5 @@
+tests.test_options::test_suggest_possible_options[--bounds-(Did you mean one of: '--bound', '--count'?)]
+tests.test_options::test_suggest_possible_options[--bount-(Did you mean one of: '--bound', '--count'?)]
+tests.test_options::test_suggest_possible_options[--cat-Did you mean '--count'?]
+tests.test_options::test_unknown_options[--foo]
+tests.test_options::test_unknown_options[-f]

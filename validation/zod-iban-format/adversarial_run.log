@@ -1,0 +1,19 @@
+[..] building verifier image for zod-iban-format
+[OK] control (reference solution): reward=1
+[OK] no-checksum                    reward=0 feature_pass_rate=0.8036 regression_ok=0
+[OK] lowercase-allowed              reward=0 feature_pass_rate=0.9821 regression_ok=1
+[OK] check-digits-unrestricted      reward=0 feature_pass_rate=0.9643 regression_ok=0
+[OK] length-upper-bound-wrong       reward=0 feature_pass_rate=0.9821 regression_ok=1
+[OK] length-lower-bound-wrong       reward=0 feature_pass_rate=0.9643 regression_ok=1
+[OK] letters-map-from-one           reward=0 feature_pass_rate=0.6429 regression_ok=1
+[OK] no-rearrangement               reward=0 feature_pass_rate=0.6429 regression_ok=1
+[OK] remainder-zero                 reward=0 feature_pass_rate=0.6429 regression_ok=1
+[OK] compiler-not-updated           reward=0 feature_pass_rate=0.9821 regression_ok=1
+[OK] from-json-schema-not-mapped    reward=0 feature_pass_rate=0.9643 regression_ok=1
+[OK] json-schema-pattern-missing    reward=0 feature_pass_rate=0.9643 regression_ok=1
+[OK] issue-format-copy-paste        reward=0 feature_pass_rate=0.9464 regression_ok=1
+[OK] mini-api-missing               reward=0 feature_pass_rate=0.8929 regression_ok=1
+[OK] aborts-further-checks          reward=0 feature_pass_rate=0.9821 regression_ok=1
+-> kill rate 14/14; report: validation/zod-iban-format/adversarial_report.json
+-> upstream tests alone would kill 9/14
+exit=0

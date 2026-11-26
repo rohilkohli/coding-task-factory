@@ -1,0 +1,264 @@
+{
+  "repo": "zod",
+  "strategy": "function-removal",
+  "seed": 1,
+  "count_requested": 2,
+  "candidates_tried": 15,
+  "accepted": 2,
+  "funnel": {
+    "accepted": 2,
+    "rejected:no-adversarial-sites": 7,
+    "rejected:too-broad": 1,
+    "rejected:weak-tests": 5
+  },
+  "reference": {
+    "tests": 5545,
+    "stable_passing": 5545,
+    "flaky": 0
+  },
+  "thresholds": {
+    "min_kill_rate": 0.75,
+    "max_f2p_fraction": 0.25,
+    "adversarial_per_task": 4
+  },
+  "tasks": [
+    "zod-impl-ownpaths-c21831",
+    "zod-impl-run-e275bb"
+  ],
+  "elapsed_sec": 1339.7,
+  "candidates": [
+    {
+      "index": 1,
+      "id": "zod-impl-seterrormap-a618f6",
+      "file": "packages/zod/src/v4/classic/compat.ts",
+      "function": "setErrorMap",
+      "line": 44,
+      "change": "body removed (3 lines)",
+      "f2p": 2,
+      "p2p": 5543,
+      "status": "rejected",
+      "reason": "no-adversarial-sites"
+    },
+    {
+      "index": 2,
+      "id": "zod-impl-checkobjectguards-aa8439",
+      "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+      "function": "checkObjectGuards",
+      "line": 165,
+      "change": "body removed (46 lines)",
+      "f2p": 12,
+      "p2p": 5533,
+      "status": "rejected",
+      "reason": "no-adversarial-sites"
+    },
+    {
+      "index": 3,
+      "id": "zod-impl-compile-d6f895",
+      "file": "packages/zod/src/v4/core/doc.ts",
+      "function": "compile",
+      "line": 43,
+      "change": "body removed (7 lines)",
+      "f2p": 453,
+      "p2p": 5092,
+      "adversarial": {
+        "mutants": 1,
+        "killed": 0,
+        "kill_rate": 0.0,
+        "survivors": [
+          "?? -> || @ offset 1314"
+        ]
+      },
+      "status": "rejected",
+      "reason": "weak-tests"
+    },
+    {
+      "index": 4,
+      "id": "zod-impl-get-08ba1c",
+      "file": "packages/zod/src/v4/core/registries.ts",
+      "function": "get",
+      "line": 60,
+      "change": "body removed (8 lines)",
+      "f2p": 342,
+      "p2p": 5203,
+      "adversarial": {
+        "mutants": 1,
+        "killed": 0,
+        "kill_rate": 0.0,
+        "survivors": [
+          "?? -> || @ offset 2009"
+        ]
+      },
+      "status": "rejected",
+      "reason": "weak-tests"
+    },
+    {
+      "index": 5,
+      "id": "zod-impl-withchecks-36a754",
+      "file": "packages/zod/src/v4/mini/in-out.ts",
+      "function": "withChecks",
+      "line": 11,
+      "change": "body removed (3 lines)",
+      "f2p": 3,
+      "p2p": 5542,
+      "adversarial": {
+        "mutants": 3,
+        "killed": 1,
+        "kill_rate": 0.333,
+        "survivors": [
+          "?? -> || @ offset 571",
+          "true -> false @ offset 604"
+        ]
+      },
+      "status": "rejected",
+      "reason": "weak-tests"
+    },
+    {
+      "index": 6,
+      "id": "zod-impl-generatenumberformatcheck-ba79fe",
+      "file": "packages/zod/src/v4/core/compile.ts",
+      "function": "generateNumberFormatCheck",
+      "line": 574,
+      "change": "body removed (26 lines)",
+      "f2p": 3,
+      "p2p": 5542,
+      "status": "rejected",
+      "reason": "no-adversarial-sites"
+    },
+    {
+      "index": 7,
+      "id": "zod-impl-internals-1b9a0e",
+      "file": "packages/zod/src/v4/core/core.ts",
+      "function": "Internals",
+      "line": 62,
+      "change": "body removed (3 lines)",
+      "f2p": 2171,
+      "p2p": 3374,
+      "status": "rejected",
+      "reason": "too-broad"
+    },
+    {
+      "index": 8,
+      "id": "zod-impl-sameissue-2aead8",
+      "file": "packages/zod/src/v4/core/schemas.ts",
+      "function": "sameIssue",
+      "line": 2482,
+      "change": "body removed (11 lines)",
+      "f2p": 15,
+      "p2p": 5530,
+      "adversarial": {
+        "mutants": 4,
+        "killed": 2,
+        "kill_rate": 0.5,
+        "survivors": [
+          "false -> true @ offset 80815",
+          "- -> + @ offset 80990"
+        ]
+      },
+      "status": "rejected",
+      "reason": "weak-tests"
+    },
+    {
+      "index": 9,
+      "id": "zod-impl-lazyprocessor-20375e",
+      "file": "packages/zod/src/v4/core/json-schema-processors.ts",
+      "function": "lazyProcessor",
+      "line": 842,
+      "change": "body removed (4 lines)",
+      "f2p": 9,
+      "p2p": 5536,
+      "status": "rejected",
+      "reason": "no-adversarial-sites"
+    },
+    {
+      "index": 10,
+      "id": "zod-impl-ownpaths-c21831",
+      "file": "packages/zod/src/v4/core/util.ts",
+      "function": "ownPaths",
+      "line": 985,
+      "change": "body removed (4 lines)",
+      "f2p": 21,
+      "p2p": 5524,
+      "adversarial": {
+        "mutants": 2,
+        "killed": 2,
+        "kill_rate": 1.0,
+        "survivors": []
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 11,
+      "id": "zod-impl-file-2764b9",
+      "file": "packages/zod/src/v4/core/api.ts",
+      "function": "_file",
+      "line": 1469,
+      "change": "body removed (4 lines)",
+      "f2p": 15,
+      "p2p": 5530,
+      "status": "rejected",
+      "reason": "no-adversarial-sites"
+    },
+    {
+      "index": 12,
+      "id": "zod-impl-formaterror-c6bb4f",
+      "file": "packages/zod/src/v4/core/errors.ts",
+      "function": "formatError",
+      "line": 351,
+      "change": "body removed (45 lines)",
+      "f2p": 18,
+      "p2p": 5527,
+      "status": "rejected",
+      "reason": "no-adversarial-sites"
+    },
+    {
+      "index": 13,
+      "id": "zod-impl-run-e275bb",
+      "file": "packages/zod/src/v4/core/visit.ts",
+      "function": "run",
+      "line": 42,
+      "change": "body removed (13 lines)",
+      "f2p": 57,
+      "p2p": 5488,
+      "adversarial": {
+        "mutants": 3,
+        "killed": 3,
+        "kill_rate": 1.0,
+        "survivors": []
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 14,
+      "id": "zod-impl-deeppartial-f9b529",
+      "file": "packages/zod/src/v4/mini/deep-partial.ts",
+      "function": "deepPartial",
+      "line": 64,
+      "change": "body removed (7 lines)",
+      "f2p": 5,
+      "p2p": 5540,
+      "status": "rejected",
+      "reason": "no-adversarial-sites"
+    },
+    {
+      "index": 15,
+      "id": "zod-impl-resolveref-e2887e",
+      "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+      "function": "resolveRef",
+      "line": 131,
+      "change": "body removed (19 lines)",
+      "f2p": 7,
+      "p2p": 5538,
+      "adversarial": {
+        "mutants": 4,
+        "killed": 2,
+        "kill_rate": 0.5,
+        "survivors": [
+          "|| -> && @ offset 3900",
+          "!== -> === @ offset 3484"
+        ]
+      },
+      "status": "rejected",
+      "reason": "weak-tests"
+    }
+  ]
+}

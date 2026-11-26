@@ -1,0 +1,47 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/src" }]
+
+[task]
+name = "coding-task-factory/click-impl-nosuchoption-format-message-b25755"
+version = "1.0.0"
+description = "Re-implement NoSuchOption.format_message (src/click/exceptions.py)"
+authors = []
+keywords = ["python", "click", "feature-implementation", "generated"]
+
+[metadata]
+generator = "function-removal"
+seed = 1
+source_repo = "https://github.com/pallets/click"
+source_commit = "08b803cf32ceb2ae6a772c62d5da42757a897d44"
+language = "python"
+file = "src/click/exceptions.py"
+function = "NoSuchOption.format_message"
+line = 262
+change = "body removed (3 lines)"
+f2p_tests = 5
+p2p_tests = 2598
+adversarial_mutants = 1
+adversarial_killed = 1
+difficulty = "easy"
+difficulty_explanation = "Re-implement a 3-line function body from its signature, docs and call sites."
+category = "feature-implementation"
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048

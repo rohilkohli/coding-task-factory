@@ -1,0 +1,9 @@
+{
+  "task": "click-datetime-type",
+  "f2p": 58,
+  "p2p": 2563,
+  "flaky_excluded": [],
+  "reference_not_passing": 49,
+  "check_reference_reward": 1,
+  "check_untouched_reward": 0
+}

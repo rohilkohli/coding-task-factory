@@ -1,0 +1,36 @@
+{
+  "tasks": 6,
+  "passed": 6,
+  "results": {
+    "jsoncpp-bug-fastwriter-writevalue-be51db": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "jsoncpp-bug-ourreader-decodestring-06c621": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "jsoncpp-bug-value-czstring-operator-95f29e": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "jsoncpp-impl-builtstyledstreamwriter-writewithindent-46b8db": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "jsoncpp-impl-path-resolve-087a97": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "jsoncpp-impl-styledstreamwriter-ismultilinearray-fef4cc": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    }
+  }
+}

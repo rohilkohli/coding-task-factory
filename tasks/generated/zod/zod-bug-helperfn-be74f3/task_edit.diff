@@ -1,0 +1,11 @@
+--- a/packages/zod/src/v4/core/compile.ts
++++ b/packages/zod/src/v4/core/compile.ts
+@@ -733,7 +733,7 @@
+       const result = checkFn(fakePayload);
+       // Throw rather than return INVALID: the interpreter throws here, and a union would read INVALID as a rejected branch.
+       if (result instanceof Promise) throwAsync();
+-      return fakePayload.issues.length === 0 ? fakePayload.value : INVALID;
++      return fakePayload.issues.length === 1 ? fakePayload.value : INVALID;
+     };
+     const helperConst = addUserConstant(ctx, helperFn);
+     const outVar = newVar(ctx);

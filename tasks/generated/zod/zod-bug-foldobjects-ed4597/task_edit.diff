@@ -1,0 +1,11 @@
+--- a/packages/zod/src/v4/core/to-json-schema.ts
++++ b/packages/zod/src/v4/core/to-json-schema.ts
+@@ -525,7 +525,7 @@
+       if (constraint && !constraints.some((seen) => JSON.stringify(seen) === JSON.stringify(constraint)))
+         constraints.push(constraint);
+     }
+-    if (constraints.length === 1) folded.additionalProperties = constraints[0]!;
++    if (constraints.length !== 1) folded.additionalProperties = constraints[0]!;
+     else if (constraints.length > 1) folded.additionalProperties = { allOf: constraints };
+   }
+   return folded;

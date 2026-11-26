@@ -1,0 +1,6 @@
+{
+  "upstream_tests": [
+    "tests.test_basic::test_datetime_",
+    "tests.test_info_dict::"
+  ]
+}

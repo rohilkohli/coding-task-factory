@@ -1,0 +1,290 @@
+diff --git a/include/json/reader.h b/include/json/reader.h
+index d4db75a..d5063c2 100644
+--- a/include/json/reader.h
++++ b/include/json/reader.h
+@@ -349,9 +349,6 @@ public:
+    * - `"rejectDupKeys": false or true`
+    *   - If true, `parse()` returns false when a key is duplicated within an
+    *     object.
+-   * - `"allowSpecialFloats": false or true`
+-   *   - If true, special float values (NaNs and infinities) are allowed and
+-   *     their values are lossfree restorable.
+    * - `"skipBom": false or true`
+    *   - If true, if the input starts with the Unicode byte order mark (BOM),
+    *     it is skipped.
+diff --git a/src/lib_json/json_reader.cpp b/src/lib_json/json_reader.cpp
+index 39af2c4..4d91569 100644
+--- a/src/lib_json/json_reader.cpp
++++ b/src/lib_json/json_reader.cpp
+@@ -860,7 +860,6 @@ public:
+   bool allowSingleQuotes_;
+   bool failIfExtra_;
+   bool rejectDupKeys_;
+-  bool allowSpecialFloats_;
+   bool skipBom_;
+   size_t stackLimit_;
+ }; // OurFeatures
+@@ -898,9 +897,6 @@ private:
+     tokenTrue,
+     tokenFalse,
+     tokenNull,
+-    tokenNaN,
+-    tokenPosInf,
+-    tokenNegInf,
+     tokenArraySeparator,
+     tokenMemberSeparator,
+     tokenComment,
+@@ -934,7 +930,7 @@ private:
+   bool readCppStyleComment();
+   bool readString();
+   bool readStringSingleQuote();
+-  bool readNumber(bool checkInf);
++  void readNumber();
+   bool readValue();
+   bool readObject(Token& token);
+   bool readArray(Token& token);
+@@ -1103,24 +1099,6 @@ bool OurReader::readValue() {
+     currentValue().setOffsetStart(token.start_ - begin_);
+     currentValue().setOffsetLimit(token.end_ - begin_);
+   } break;
+-  case tokenNaN: {
+-    Value v(std::numeric_limits<double>::quiet_NaN());
+-    currentValue().swapPayload(v);
+-    currentValue().setOffsetStart(token.start_ - begin_);
+-    currentValue().setOffsetLimit(token.end_ - begin_);
+-  } break;
+-  case tokenPosInf: {
+-    Value v(std::numeric_limits<double>::infinity());
+-    currentValue().swapPayload(v);
+-    currentValue().setOffsetStart(token.start_ - begin_);
+-    currentValue().setOffsetLimit(token.end_ - begin_);
+-  } break;
+-  case tokenNegInf: {
+-    Value v(-std::numeric_limits<double>::infinity());
+-    currentValue().swapPayload(v);
+-    currentValue().setOffsetStart(token.start_ - begin_);
+-    currentValue().setOffsetLimit(token.end_ - begin_);
+-  } break;
+   case tokenArraySeparator:
+   case tokenObjectEnd:
+   case tokenArrayEnd:
+@@ -1204,24 +1182,9 @@ bool OurReader::readToken(Token& token) {
+   case '7':
+   case '8':
+   case '9':
+-    token.type_ = tokenNumber;
+-    readNumber(false);
+-    break;
+   case '-':
+-    if (readNumber(true)) {
+-      token.type_ = tokenNumber;
+-    } else {
+-      token.type_ = tokenNegInf;
+-      ok = features_.allowSpecialFloats_ && match("nfinity", 7);
+-    }
+-    break;
+-  case '+':
+-    if (readNumber(true)) {
+-      token.type_ = tokenNumber;
+-    } else {
+-      token.type_ = tokenPosInf;
+-      ok = features_.allowSpecialFloats_ && match("nfinity", 7);
+-    }
++    token.type_ = tokenNumber;
++    readNumber();
+     break;
+   case 't':
+     token.type_ = tokenTrue;
+@@ -1235,22 +1198,6 @@ bool OurReader::readToken(Token& token) {
+     token.type_ = tokenNull;
+     ok = match("ull", 3);
+     break;
+-  case 'N':
+-    if (features_.allowSpecialFloats_) {
+-      token.type_ = tokenNaN;
+-      ok = match("aN", 2);
+-    } else {
+-      ok = false;
+-    }
+-    break;
+-  case 'I':
+-    if (features_.allowSpecialFloats_) {
+-      token.type_ = tokenPosInf;
+-      ok = match("nfinity", 7);
+-    } else {
+-      ok = false;
+-    }
+-    break;
+   case ',':
+     token.type_ = tokenArraySeparator;
+     break;
+@@ -1419,12 +1366,8 @@ bool OurReader::readCppStyleComment() {
+   return true;
+ }
+ 
+-bool OurReader::readNumber(bool checkInf) {
++void OurReader::readNumber() {
+   Location p = current_;
+-  if (checkInf && p != end_ && *p == 'I') {
+-    current_ = ++p;
+-    return false;
+-  }
+   char c = '0'; // stopgap for already consumed character
+   // integral part
+   while (c >= '0' && c <= '9')
+@@ -1443,7 +1386,6 @@ bool OurReader::readNumber(bool checkInf) {
+     while (c >= '0' && c <= '9')
+       c = (current_ = p) < end_ ? *p++ : '\0';
+   }
+-  return true;
+ }
+ bool OurReader::readString() {
+   Char c = 0;
+@@ -1949,7 +1891,6 @@ CharReader* CharReaderBuilder::newCharReader() const {
+   features.stackLimit_ = static_cast<size_t>(settings_["stackLimit"].asUInt());
+   features.failIfExtra_ = settings_["failIfExtra"].asBool();
+   features.rejectDupKeys_ = settings_["rejectDupKeys"].asBool();
+-  features.allowSpecialFloats_ = settings_["allowSpecialFloats"].asBool();
+   features.skipBom_ = settings_["skipBom"].asBool();
+   return new OurCharReader(collectComments, features);
+ }
+@@ -1966,7 +1907,6 @@ bool CharReaderBuilder::validate(Json::Value* invalid) const {
+       "stackLimit",
+       "failIfExtra",
+       "rejectDupKeys",
+-      "allowSpecialFloats",
+       "skipBom",
+   };
+   for (auto si = settings_.begin(); si != settings_.end(); ++si) {
+@@ -1996,7 +1936,6 @@ void CharReaderBuilder::strictMode(Json::Value* settings) {
+   (*settings)["stackLimit"] = 256;
+   (*settings)["failIfExtra"] = true;
+   (*settings)["rejectDupKeys"] = true;
+-  (*settings)["allowSpecialFloats"] = false;
+   (*settings)["skipBom"] = true;
+   //! [CharReaderBuilderStrictMode]
+ }
+@@ -2013,7 +1952,6 @@ void CharReaderBuilder::setDefaults(Json::Value* settings) {
+   (*settings)["stackLimit"] = 256;
+   (*settings)["failIfExtra"] = false;
+   (*settings)["rejectDupKeys"] = false;
+-  (*settings)["allowSpecialFloats"] = false;
+   (*settings)["skipBom"] = true;
+   //! [CharReaderBuilderDefaults]
+ }
+@@ -2029,7 +1967,6 @@ void CharReaderBuilder::ecma404Mode(Json::Value* settings) {
+   (*settings)["stackLimit"] = 256;
+   (*settings)["failIfExtra"] = true;
+   (*settings)["rejectDupKeys"] = false;
+-  (*settings)["allowSpecialFloats"] = false;
+   (*settings)["skipBom"] = false;
+   //! [CharReaderBuilderECMA404Mode]
+ }
+diff --git a/src/test_lib_json/main.cpp b/src/test_lib_json/main.cpp
+index 313e9f9..ae05cbe 100644
+--- a/src/test_lib_json/main.cpp
++++ b/src/test_lib_json/main.cpp
+@@ -3972,103 +3972,6 @@ JSONTEST_FIXTURE_LOCAL(CharReaderAllowZeroesTest, issue176) {
+   }
+ }
+ 
+-struct CharReaderAllowSpecialFloatsTest : JsonTest::TestCase {};
+-
+-JSONTEST_FIXTURE_LOCAL(CharReaderAllowSpecialFloatsTest, specialFloat) {
+-  Json::CharReaderBuilder b;
+-  CharReaderPtr reader(b.newCharReader());
+-  Json::Value root;
+-  Json::String errs;
+-  {
+-    char const doc[] = "{\"a\": NaN}";
+-    bool ok = reader->parse(doc, doc + std::strlen(doc), &root, &errs);
+-    JSONTEST_ASSERT(!ok);
+-    JSONTEST_ASSERT_STRING_EQUAL(
+-        "* Line 1, Column 7\n"
+-        "  Syntax error: value, object or array expected.\n",
+-        errs);
+-  }
+-  {
+-    char const doc[] = "{\"a\": Infinity}";
+-    bool ok = reader->parse(doc, doc + std::strlen(doc), &root, &errs);
+-    JSONTEST_ASSERT(!ok);
+-    JSONTEST_ASSERT_STRING_EQUAL(
+-        "* Line 1, Column 7\n"
+-        "  Syntax error: value, object or array expected.\n",
+-        errs);
+-  }
+-}
+-
+-JSONTEST_FIXTURE_LOCAL(CharReaderAllowSpecialFloatsTest, issue209) {
+-  Json::CharReaderBuilder b;
+-  b.settings_["allowSpecialFloats"] = true;
+-  Json::Value root;
+-  Json::String errs;
+-  CharReaderPtr reader(b.newCharReader());
+-  {
+-    char const doc[] = R"({"a":NaN,"b":Infinity,"c":-Infinity,"d":+Infinity})";
+-    bool ok = reader->parse(doc, doc + std::strlen(doc), &root, &errs);
+-    JSONTEST_ASSERT(ok);
+-    JSONTEST_ASSERT_STRING_EQUAL("", errs);
+-    JSONTEST_ASSERT_EQUAL(4u, root.size());
+-    double n = root["a"].asDouble();
+-    JSONTEST_ASSERT(std::isnan(n));
+-    JSONTEST_ASSERT_EQUAL(std::numeric_limits<double>::infinity(),
+-                          root.get("b", 0.0));
+-    JSONTEST_ASSERT_EQUAL(-std::numeric_limits<double>::infinity(),
+-                          root.get("c", 0.0));
+-    JSONTEST_ASSERT_EQUAL(std::numeric_limits<double>::infinity(),
+-                          root.get("d", 0.0));
+-  }
+-
+-  struct TestData {
+-    int line;
+-    bool ok;
+-    Json::String in;
+-  };
+-  const TestData test_data[] = {
+-      {__LINE__, true, "{\"a\":9}"},          //
+-      {__LINE__, false, "{\"a\":0Infinity}"}, //
+-      {__LINE__, false, "{\"a\":1Infinity}"}, //
+-      {__LINE__, false, "{\"a\":9Infinity}"}, //
+-      {__LINE__, false, "{\"a\":0nfinity}"},  //
+-      {__LINE__, false, "{\"a\":1nfinity}"},  //
+-      {__LINE__, false, "{\"a\":9nfinity}"},  //
+-      {__LINE__, false, "{\"a\":nfinity}"},   //
+-      {__LINE__, false, "{\"a\":.nfinity}"},  //
+-      {__LINE__, false, "{\"a\":9nfinity}"},  //
+-      {__LINE__, false, "{\"a\":-nfinity}"},  //
+-      {__LINE__, true, "{\"a\":Infinity}"},   //
+-      {__LINE__, false, "{\"a\":.Infinity}"}, //
+-      {__LINE__, false, "{\"a\":_Infinity}"}, //
+-      {__LINE__, false, "{\"a\":_nfinity}"},  //
+-      {__LINE__, true, "{\"a\":-Infinity}"},  //
+-      {__LINE__, true, "{\"a\":+Infinity}"}   //
+-  };
+-  for (const auto& td : test_data) {
+-    bool ok = reader->parse(&*td.in.begin(), &*td.in.begin() + td.in.size(),
+-                            &root, &errs);
+-    // clang-format off
+-    JSONTEST_ASSERT(td.ok == ok) <<
+-        "line:" << td.line << "\n  " <<
+-        "expected: {ok:" << td.ok << ", in:\'" << td.in << "\'}\n " <<
+-        "actual: {ok:" << ok << "}\n";
+-    // clang-format on
+-  }
+-
+-  {
+-    char const doc[] = R"({"posInf": +Infinity, "NegInf": -Infinity})";
+-    bool ok = reader->parse(doc, doc + std::strlen(doc), &root, &errs);
+-    JSONTEST_ASSERT(ok);
+-    JSONTEST_ASSERT_STRING_EQUAL("", errs);
+-    JSONTEST_ASSERT_EQUAL(2u, root.size());
+-    JSONTEST_ASSERT_EQUAL(std::numeric_limits<double>::infinity(),
+-                          root["posInf"].asDouble());
+-    JSONTEST_ASSERT_EQUAL(-std::numeric_limits<double>::infinity(),
+-                          root["NegInf"].asDouble());
+-  }
+-}
+-
+ struct EscapeSequenceTest : JsonTest::TestCase {};
+ 
+ JSONTEST_FIXTURE_LOCAL(EscapeSequenceTest, readerParseEscapeSequence) {

@@ -1,0 +1,47 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/packages/zod/src" }]
+
+[task]
+name = "coding-task-factory/zod-bug-foldobjects-ed4597"
+version = "1.0.0"
+description = "Fix a regression injected into foldObjects (packages/zod/src/v4/core/to-json-schema.ts)"
+authors = []
+keywords = ["typescript", "zod", "bug-fix", "generated"]
+
+[metadata]
+generator = "bug-injection"
+seed = 1
+source_repo = "https://github.com/colinhacks/zod"
+source_commit = "d40c329910436e528d3c26cb1b9179e05abebf05"
+language = "typescript"
+file = "packages/zod/src/v4/core/to-json-schema.ts"
+function = "foldObjects"
+line = 483
+change = "`===` -> `!==`"
+f2p_tests = 3
+p2p_tests = 5542
+adversarial_mutants = 4
+adversarial_killed = 3
+difficulty = "medium"
+difficulty_explanation = "Single-token defect (`===` -> `!==`) detected by 3 failing test(s); hint: failing tests only."
+category = "bug-fix"
+
+[verifier]
+timeout_sec = 900.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 2
+memory_mb = 4096

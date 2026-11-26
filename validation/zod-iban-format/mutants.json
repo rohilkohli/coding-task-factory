@@ -1,0 +1,167 @@
+[
+  {
+    "id": "no-checksum",
+    "description": "Only the shape regex is checked; the mod-97 checksum is skipped",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/core/schemas.ts",
+        "old": "  if (!regexes.iban.test(input)) return false;\n  return isIso7064Mod97(input);",
+        "new": "  return regexes.iban.test(input);"
+      }
+    ]
+  },
+  {
+    "id": "lowercase-allowed",
+    "description": "Regex accepts lowercase letters",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/core/regexes.ts",
+        "old": "/^[A-Z]{2}(?!00|01|99)\\d{2}[A-Z0-9]{11,30}$/",
+        "new": "/^[A-Za-z]{2}(?!00|01|99)\\d{2}[A-Za-z0-9]{11,30}$/"
+      }
+    ]
+  },
+  {
+    "id": "check-digits-unrestricted",
+    "description": "Check digits 00, 01 and 99 are not rejected",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/core/regexes.ts",
+        "old": "(?!00|01|99)",
+        "new": ""
+      }
+    ]
+  },
+  {
+    "id": "length-upper-bound-wrong",
+    "description": "BBAN allowed up to 32 characters (total length 36)",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/core/regexes.ts",
+        "old": "[A-Z0-9]{11,30}$",
+        "new": "[A-Z0-9]{11,32}$"
+      }
+    ]
+  },
+  {
+    "id": "length-lower-bound-wrong",
+    "description": "BBAN allowed down to 10 characters (total length 14)",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/core/regexes.ts",
+        "old": "[A-Z0-9]{11,30}$",
+        "new": "[A-Z0-9]{10,30}$"
+      }
+    ]
+  },
+  {
+    "id": "letters-map-from-one",
+    "description": "Letters converted as A=1 instead of A=10",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/core/schemas.ts",
+        "old": "(code - 55)",
+        "new": "(code - 64)",
+        "all": true
+      }
+    ]
+  },
+  {
+    "id": "no-rearrangement",
+    "description": "Checksum computed without moving the first four characters to the end",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/core/schemas.ts",
+        "old": "  for (let i = 4; i < len; i++) {",
+        "new": "  for (let i = 0; i < len; i++) {"
+      },
+      {
+        "file": "packages/zod/src/v4/core/schemas.ts",
+        "old": "  for (let i = 0; i < 4; i++) {",
+        "new": "  for (let i = 0; i < 0; i++) {"
+      }
+    ]
+  },
+  {
+    "id": "remainder-zero",
+    "description": "Valid when remainder is 0 instead of 1",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/core/schemas.ts",
+        "old": "  return remainder === 1;",
+        "new": "  return remainder === 0;"
+      }
+    ]
+  },
+  {
+    "id": "compiler-not-updated",
+    "description": "AOT compiler has no IBAN branch (falls back to the shape pattern)",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/core/compile.ts",
+        "old": "  if (fmt === \"iban\") {\n    const validator = addConstant(ctx, isValidIBAN);\n    doc.write(`if (!${validator}(${accessor})) return INVALID;`);\n    return accessor;\n  }\n",
+        "new": ""
+      },
+      {
+        "file": "packages/zod/src/v4/core/compile.ts",
+        "old": "  isValidIBAN,\n",
+        "new": ""
+      }
+    ]
+  },
+  {
+    "id": "from-json-schema-not-mapped",
+    "description": "fromJSONSchema does not map format 'iban'",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+        "old": "        } else if (format === \"iban\") {\n          stringSchema = stringSchema.check(z.iban());\n",
+        "new": ""
+      }
+    ]
+  },
+  {
+    "id": "json-schema-pattern-missing",
+    "description": "Shape regex not attached as the schema pattern (JSON Schema lacks 'pattern')",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/core/schemas.ts",
+        "old": "  def.pattern ??= regexes.iban;\n",
+        "new": ""
+      }
+    ]
+  },
+  {
+    "id": "issue-format-copy-paste",
+    "description": "Issue reports format 'credit_card' (copied from the credit card validator)",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/core/schemas.ts",
+        "old": "      format: \"iban\",\n      input: payload.value,",
+        "new": "      format: \"credit_card\",\n      input: payload.value,"
+      }
+    ]
+  },
+  {
+    "id": "mini-api-missing",
+    "description": "zod/mini does not expose iban()",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/mini/schemas.ts",
+        "old": "// @__NO_SIDE_EFFECTS__\nexport function iban(params?: string | core.$ZodIBANParams): ZodMiniIBAN {\n  return core._iban(ZodMiniIBAN, params);\n}\n",
+        "new": ""
+      }
+    ]
+  },
+  {
+    "id": "aborts-further-checks",
+    "description": "IBAN failure always aborts instead of honouring the abort flag",
+    "edits": [
+      {
+        "file": "packages/zod/src/v4/core/schemas.ts",
+        "old": "      format: \"iban\",\n      input: payload.value,\n      inst,\n      continue: !def.abort,",
+        "new": "      format: \"iban\",\n      input: payload.value,\n      inst,\n      continue: false,"
+      }
+    ]
+  }
+]

@@ -1,0 +1,3 @@
+src/v4/classic/tests/to-json-schema.test.ts > intersection folding a catchall constrains the sibling's keys too
+src/v4/classic/tests/to-json-schema.test.ts > intersection folding the emitted openness agrees with the parser for every pair of object modes
+src/v4/classic/tests/to-json-schema.test.ts > intersection folding two catchalls both constrain the keys neither declares

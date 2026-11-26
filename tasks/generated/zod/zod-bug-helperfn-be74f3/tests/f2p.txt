@@ -1,0 +1,5 @@
+src/v4/core/tests/compile-differential.test.ts > superRefine adds issues
+src/v4/core/tests/compile-generative.test.ts > random schemas parse identically through the interpreter and the compiler
+src/v4/core/tests/compile.test.ts > matches Zod: superRefine
+src/v4/core/tests/compile.test.ts > superRefine basic
+src/v4/core/tests/compile.test.ts > superRefine with multiple issues

@@ -1,0 +1,8 @@
+tests.test_arguments::test_good_defaults_for_nargs[argument_params9-args9-expected9]
+tests.test_arguments::test_nargs_specified_plus_star_ordering
+tests.test_arguments::test_nargs_tup
+tests.test_arguments::test_nargs_tup_composite[opts0]
+tests.test_arguments::test_nargs_tup_composite[opts1]
+tests.test_arguments::test_nargs_tup_composite[opts2]
+tests.test_arguments::test_nargs_tup_composite[opts3]
+tests.test_shell_completion::test_argument_nargs

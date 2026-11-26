@@ -1,0 +1,179 @@
+{
+  "repo": "jsoncpp",
+  "strategy": "function-removal",
+  "seed": 1,
+  "count_requested": 3,
+  "candidates_tried": 8,
+  "accepted": 3,
+  "funnel": {
+    "accepted": 3,
+    "rejected:no-adversarial-sites": 1,
+    "rejected:weak-tests": 2,
+    "surplus": 2
+  },
+  "reference": {
+    "tests": 340,
+    "stable_passing": 340,
+    "flaky": 0
+  },
+  "thresholds": {
+    "min_kill_rate": 0.75,
+    "max_f2p_fraction": 0.25,
+    "adversarial_per_task": 6
+  },
+  "tasks": [
+    "jsoncpp-impl-path-resolve-087a97",
+    "jsoncpp-impl-styledstreamwriter-ismultilinearray-fef4cc",
+    "jsoncpp-impl-builtstyledstreamwriter-writewithindent-46b8db"
+  ],
+  "elapsed_sec": 320.2,
+  "candidates": [
+    {
+      "index": 1,
+      "id": "jsoncpp-impl-styledwriter-pushvalue-be4eea",
+      "file": "src/lib_json/json_writer.cpp",
+      "function": "StyledWriter::pushValue",
+      "line": 522,
+      "change": "body removed (4 lines)",
+      "f2p": 64,
+      "p2p": 276,
+      "status": "rejected",
+      "reason": "no-adversarial-sites"
+    },
+    {
+      "index": 2,
+      "id": "jsoncpp-impl-path-resolve-087a97",
+      "file": "src/lib_json/json_value.cpp",
+      "function": "Path::resolve",
+      "line": 1728,
+      "change": "body removed (15 lines)",
+      "f2p": 1,
+      "p2p": 339,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 6,
+        "kill_rate": 1.0,
+        "survivors": []
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 3,
+      "id": "jsoncpp-impl-styledstreamwriter-ismultilinearray-fef4cc",
+      "file": "src/lib_json/json_writer.cpp",
+      "function": "StyledStreamWriter::isMultilineArray",
+      "line": 716,
+      "change": "body removed (24 lines)",
+      "f2p": 14,
+      "p2p": 326,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 5,
+        "kill_rate": 0.833,
+        "survivors": [
+          "< -> <= @ offset 21089"
+        ]
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 4,
+      "id": "jsoncpp-impl-reader-normalizeeol-d0e347",
+      "file": "src/lib_json/json_reader.cpp",
+      "function": "Reader::normalizeEOL",
+      "line": 343,
+      "change": "body removed (14 lines)",
+      "f2p": 67,
+      "p2p": 273,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 3,
+        "kill_rate": 0.5,
+        "survivors": [
+          "!= -> == @ offset 9222",
+          "== -> != @ offset 9241",
+          "&& -> || @ offset 9229"
+        ]
+      },
+      "status": "rejected",
+      "reason": "weak-tests"
+    },
+    {
+      "index": 5,
+      "id": "jsoncpp-impl-value-isintegral-783d6c",
+      "file": "src/lib_json/json_value.cpp",
+      "function": "Value::isIntegral",
+      "line": 1467,
+      "change": "body removed (13 lines)",
+      "f2p": 7,
+      "p2p": 333,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 3,
+        "kill_rate": 0.5,
+        "survivors": [
+          ">= -> <= @ offset 45418",
+          "<= -> < @ offset 45444",
+          "<= -> >= @ offset 45444"
+        ]
+      },
+      "status": "rejected",
+      "reason": "weak-tests"
+    },
+    {
+      "index": 6,
+      "id": "jsoncpp-impl-builtstyledstreamwriter-writewithindent-46b8db",
+      "file": "src/lib_json/json_writer.cpp",
+      "function": "BuiltStyledStreamWriter::writeWithIndent",
+      "line": 1042,
+      "change": "body removed (4 lines)",
+      "f2p": 28,
+      "p2p": 312,
+      "adversarial": {
+        "mutants": 2,
+        "killed": 2,
+        "kill_rate": 1.0,
+        "survivors": []
+      },
+      "status": "accepted"
+    },
+    {
+      "index": 7,
+      "id": "jsoncpp-impl-ourreader-readcppstylecomment-fcbe5f",
+      "file": "src/lib_json/json_reader.cpp",
+      "function": "OurReader::readCppStyleComment",
+      "line": 1406,
+      "change": "body removed (11 lines)",
+      "f2p": 69,
+      "p2p": 271,
+      "adversarial": {
+        "mutants": 6,
+        "killed": 5,
+        "kill_rate": 0.833,
+        "survivors": [
+          "!= -> == @ offset 40413"
+        ]
+      },
+      "status": "surplus",
+      "reason": "target count already reached"
+    },
+    {
+      "index": 8,
+      "id": "jsoncpp-impl-builtstyledstreamwriter-writevalue-772740",
+      "file": "src/lib_json/json_writer.cpp",
+      "function": "BuiltStyledStreamWriter::writeValue",
+      "line": 883,
+      "change": "body removed (59 lines)",
+      "f2p": 76,
+      "p2p": 264,
+      "adversarial": {
+        "mutants": 2,
+        "killed": 2,
+        "kill_rate": 1.0,
+        "survivors": []
+      },
+      "status": "surplus",
+      "reason": "target count already reached"
+    }
+  ]
+}

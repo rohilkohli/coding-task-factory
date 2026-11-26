@@ -1,0 +1,11 @@
+--- a/src/click/exceptions.py
++++ b/src/click/exceptions.py
+@@ -101,7 +101,7 @@
+                 option=max(help_names, key=len),
+             )
+             hint = f"{hint}\n"
+-        if self.ctx is not None:
++        if self.ctx is None:
+             color = self.ctx.color
+             echo(f"{self.ctx.get_usage()}\n{hint}", file=file, color=color)
+         echo(
