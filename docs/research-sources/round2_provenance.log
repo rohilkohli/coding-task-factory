@@ -1,0 +1,12 @@
+2026-11-26T13:00:16Z r01_mutation_ops rc=0 query=search=mutation operators statement deletion higher order mutants&filter=from_publication_date:2023-01-01
+2026-11-26T13:00:17Z r02_equivalent rc=0 query=search=equivalent mutant detection large language models&filter=from_publication_date:2023-01-01
+2026-11-26T13:00:19Z r03_irt rc=0 query=search=item response theory benchmark difficulty language models&filter=from_publication_date:2023-01-01
+2026-11-26T13:00:21Z r04_difficulty rc=0 query=search=task difficulty estimation coding benchmark agents&filter=from_publication_date:2023-01-01
+2026-11-26T13:00:22Z r05_issue_text rc=0 query=search=generating issue descriptions bug reports for software engineering tasks LLM&filter=from_publication_date:2023-01-01
+2026-11-26T13:00:23Z r06_multi_bug rc=0 query=search=combining multiple bugs harder software engineering tasks synthetic&filter=from_publication_date:2023-01-01
+2026-11-26T13:00:25Z r07_test_aug rc=0 query=search=automated test augmentation strengthen weak tests benchmark patches&filter=from_publication_date:2023-01-01
+2026-11-26T13:00:26Z r08_memorization rc=0 query=search=memorization detection code benchmark perturbation renaming&filter=from_publication_date:2023-01-01
+2026-11-26T13:00:29Z r09_reward_hack rc=0 query=search=reward hacking coding agents tests modification benchmark&filter=from_publication_date:2023-01-01
+2026-11-26T13:00:30Z r10_bug_synth rc=0 query=search=realistic bug injection learned bug generation neural&filter=from_publication_date:2023-01-01
+2026-11-26T13:00:31Z r11_discriminative rc=0 query=search=benchmark saturation discriminative power item selection LLM evaluation&filter=from_publication_date:2023-01-01
+2026-11-26T13:00:33Z r12_rubric rc=0 query=search=LLM judge rubric code quality evaluation beyond tests&filter=from_publication_date:2023-01-01
