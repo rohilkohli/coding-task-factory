@@ -1,0 +1,12 @@
+2026-11-27T04:35:34Z s01_testgen_bench rc=0 query=search=benchmark unit test generation agents mutation score bug reproduction tests&filter=from_publication_date:2023-01-01
+2026-11-27T04:35:35Z s02_differential rc=0 query=search=differential testing patch validation semantic equivalence reference implementation&filter=from_publication_date:2023-01-01
+2026-11-27T04:35:36Z s03_property rc=0 query=search=property-based testing large language models oracle generation&filter=from_publication_date:2023-01-01
+2026-11-27T04:35:36Z s04_spec_from_tests rc=0 query=search=specification inference from unit tests natural language requirements generation code&filter=from_publication_date:2023-01-01
+2026-11-27T04:35:37Z s05_clarify rc=0 query=search=coding agents clarifying questions underspecified instructions simulated user interactive&filter=from_publication_date:2023-01-01
+2026-11-27T04:35:38Z s06_partial_credit rc=0 query=search=partial credit dense reward evaluation coding agents long horizon tasks&filter=from_publication_date:2023-01-01
+2026-11-27T04:35:39Z s07_live_commits rc=0 query=search=contamination-free continuously updated benchmark recent commits code generation&filter=from_publication_date:2023-01-01
+2026-11-27T04:35:40Z s08_adaptive rc=0 query=search=computerized adaptive testing evaluation large language models efficient&filter=from_publication_date:2023-01-01
+2026-11-27T04:35:41Z s09_trajectory rc=0 query=search=trajectory analysis failure modes software engineering agents behavior&filter=from_publication_date:2023-01-01
+2026-11-27T04:35:42Z s10_feature_synth rc=0 query=search=synthesizing new feature requests repository level tasks LLM generated features benchmark&filter=from_publication_date:2023-01-01
+2026-11-27T04:35:43Z s11_code_review rc=0 query=search=code review benchmark large language models agents detect defects pull requests&filter=from_publication_date:2023-01-01
+2026-11-27T04:35:44Z s12_task_families rc=0 query=search=isomorphic variants benchmark problems semantic preserving transformations robustness code models&filter=from_publication_date:2023-01-01
