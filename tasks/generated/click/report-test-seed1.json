@@ -1,0 +1,302 @@
+{
+  "repo": "click",
+  "strategy": "test-writing",
+  "seed": 1,
+  "count_requested": 3,
+  "candidates_tried": 8,
+  "accepted": 3,
+  "funnel": {
+    "accepted": 3,
+    "rejected:cheat-test-passes": 1,
+    "rejected:oracle-invalid": 1,
+    "rejected:oracle-not-rigorous": 3
+  },
+  "reference": {
+    "tests": 2652,
+    "stable_passing": 2603,
+    "flaky": 0
+  },
+  "thresholds": {
+    "min_rigor": 0.75,
+    "min_wrong_fixes": 3
+  },
+  "single_bug_stage": {
+    "candidates_tried": 20,
+    "validated_bugs": 9,
+    "funnel": {
+      "accepted": 9,
+      "rejected:undetected": 6,
+      "rejected:weak-tests": 2,
+      "surplus": 3
+    }
+  },
+  "elapsed_sec": 655.4,
+  "candidates": [
+    {
+      "index": 1,
+      "id": "click-bug-textwrapper-wrap-chunks-5d71d5",
+      "file": "src/click/_textwrap.py",
+      "function": "TextWrapper._wrap_chunks",
+      "change": "`1` -> `2`",
+      "f2p": 10,
+      "oracle": {
+        "status": {
+          "buggy": "failed",
+          "reference": "passed",
+          "wrong_1": "failed",
+          "wrong_2": "failed",
+          "wrong_3": "failed",
+          "wrong_4": "failed",
+          "wrong_5": "failed",
+          "wrong_6": "timeout"
+        },
+        "reward": 1,
+        "valid": 1,
+        "detects_bug": 1,
+        "rigor": 1.0,
+        "wrong_implementations": 6,
+        "wrong_rejected": 6
+      },
+      "cheats": {
+        "cheat_no_assertion": 0,
+        "cheat_always_fails": 0,
+        "cheat_source_peek": 0
+      },
+      "wrong_implementations": 6,
+      "status": "accepted"
+    },
+    {
+      "index": 2,
+      "id": "click-bug-group-f8933f",
+      "file": "src/click/decorators.py",
+      "function": "group",
+      "change": "`is` -> `is not`",
+      "f2p": 61,
+      "oracle": {
+        "status": {
+          "buggy": "failed",
+          "reference": "passed",
+          "wrong_1": "failed",
+          "wrong_2": "failed",
+          "wrong_3": "passed",
+          "wrong_4": "passed"
+        },
+        "reward": 0,
+        "valid": 1,
+        "detects_bug": 1,
+        "rigor": 0.5,
+        "wrong_implementations": 4,
+        "wrong_rejected": 2
+      },
+      "cheats": {
+        "cheat_no_assertion": 0,
+        "cheat_always_fails": 0,
+        "cheat_source_peek": 0
+      },
+      "wrong_implementations": 4,
+      "status": "rejected",
+      "reason": "oracle-not-rigorous"
+    },
+    {
+      "index": 3,
+      "id": "click-bug-complete-visible-commands-54c8fd",
+      "file": "src/click/core.py",
+      "function": "_complete_visible_commands",
+      "change": "`is not` -> `is`",
+      "f2p": 18,
+      "oracle": {
+        "status": {
+          "buggy": "failed",
+          "reference": "passed",
+          "wrong_1": "failed",
+          "wrong_2": "failed",
+          "wrong_3": "failed",
+          "wrong_4": "failed",
+          "wrong_5": "failed",
+          "wrong_6": "failed"
+        },
+        "reward": 1,
+        "valid": 1,
+        "detects_bug": 1,
+        "rigor": 1.0,
+        "wrong_implementations": 6,
+        "wrong_rejected": 6
+      },
+      "cheats": {
+        "cheat_no_assertion": 0,
+        "cheat_always_fails": 0,
+        "cheat_source_peek": 1
+      },
+      "wrong_implementations": 6,
+      "status": "rejected",
+      "reason": "cheat-test-passes"
+    },
+    {
+      "index": 4,
+      "id": "click-bug-path-init-d9e0bd",
+      "file": "src/click/types.py",
+      "function": "Path.__init__",
+      "change": "`and` -> `or`",
+      "f2p": 2,
+      "oracle": {
+        "status": {
+          "buggy": "failed",
+          "reference": "passed",
+          "wrong_1": "failed",
+          "wrong_2": "failed",
+          "wrong_3": "failed",
+          "wrong_4": "passed",
+          "wrong_5": "failed",
+          "wrong_6": "passed"
+        },
+        "reward": 0,
+        "valid": 1,
+        "detects_bug": 1,
+        "rigor": 0.6667,
+        "wrong_implementations": 6,
+        "wrong_rejected": 4
+      },
+      "cheats": {
+        "cheat_no_assertion": 0,
+        "cheat_always_fails": 0,
+        "cheat_source_peek": 0
+      },
+      "wrong_implementations": 6,
+      "status": "rejected",
+      "reason": "oracle-not-rigorous"
+    },
+    {
+      "index": 5,
+      "id": "click-bug-optionparser-match-short-opt-5fcee9",
+      "file": "src/click/parser.py",
+      "function": "_OptionParser._match_short_opt",
+      "change": "`<` -> `>`",
+      "f2p": 4,
+      "oracle": {
+        "status": {
+          "buggy": "failed",
+          "reference": "failed",
+          "wrong_1": "failed",
+          "wrong_2": "failed",
+          "wrong_3": "failed",
+          "wrong_4": "failed",
+          "wrong_5": "failed",
+          "wrong_6": "failed"
+        },
+        "reward": 0,
+        "valid": 0,
+        "detects_bug": 1,
+        "rigor": 1.0,
+        "wrong_implementations": 6,
+        "wrong_rejected": 6
+      },
+      "cheats": {
+        "cheat_no_assertion": 0,
+        "cheat_always_fails": 0,
+        "cheat_source_peek": 0
+      },
+      "wrong_implementations": 6,
+      "status": "rejected",
+      "reason": "oracle-invalid"
+    },
+    {
+      "index": 6,
+      "id": "click-bug-pipepager-f6063e",
+      "file": "src/click/_termui_impl.py",
+      "function": "_pipepager",
+      "change": "`and` -> `or`",
+      "f2p": 6,
+      "oracle": {
+        "status": {
+          "buggy": "failed",
+          "reference": "passed",
+          "wrong_1": "failed",
+          "wrong_2": "failed",
+          "wrong_3": "failed",
+          "wrong_4": "failed",
+          "wrong_5": "failed",
+          "wrong_6": "failed"
+        },
+        "reward": 1,
+        "valid": 1,
+        "detects_bug": 1,
+        "rigor": 1.0,
+        "wrong_implementations": 6,
+        "wrong_rejected": 6
+      },
+      "cheats": {
+        "cheat_no_assertion": 0,
+        "cheat_always_fails": 0,
+        "cheat_source_peek": 0
+      },
+      "wrong_implementations": 6,
+      "status": "accepted"
+    },
+    {
+      "index": 7,
+      "id": "click-bug-command-976d3d",
+      "file": "src/click/decorators.py",
+      "function": "command",
+      "change": "`and` -> `or`",
+      "f2p": 16,
+      "oracle": {
+        "status": {
+          "buggy": "failed",
+          "reference": "passed",
+          "wrong_1": "passed",
+          "wrong_2": "failed",
+          "wrong_3": "failed",
+          "wrong_4": "passed",
+          "wrong_5": "failed",
+          "wrong_6": "failed"
+        },
+        "reward": 0,
+        "valid": 1,
+        "detects_bug": 1,
+        "rigor": 0.6667,
+        "wrong_implementations": 6,
+        "wrong_rejected": 4
+      },
+      "cheats": {
+        "cheat_no_assertion": 0,
+        "cheat_always_fails": 0,
+        "cheat_source_peek": 0
+      },
+      "wrong_implementations": 6,
+      "status": "rejected",
+      "reason": "oracle-not-rigorous"
+    },
+    {
+      "index": 8,
+      "id": "click-bug-parameter-get-default-1282e0",
+      "file": "src/click/core.py",
+      "function": "Parameter.get_default",
+      "change": "`and` -> `or`",
+      "f2p": 1,
+      "oracle": {
+        "status": {
+          "buggy": "failed",
+          "reference": "passed",
+          "wrong_1": "failed",
+          "wrong_2": "failed",
+          "wrong_3": "failed",
+          "wrong_4": "failed",
+          "wrong_5": "failed"
+        },
+        "reward": 1,
+        "valid": 1,
+        "detects_bug": 1,
+        "rigor": 1.0,
+        "wrong_implementations": 5,
+        "wrong_rejected": 5
+      },
+      "cheats": {
+        "cheat_no_assertion": 0,
+        "cheat_always_fails": 0,
+        "cheat_source_peek": 0
+      },
+      "wrong_implementations": 5,
+      "status": "accepted"
+    }
+  ]
+}

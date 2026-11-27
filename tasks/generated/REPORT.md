@@ -6,23 +6,27 @@
 |---|---|---|---|---|---|---|
 | click | bug-injection | 1 | 4 | 3 | 1 undetected | 0.0 min (cached re-run) |
 | click | function-removal | 1 | 14 | 3 | 4 weak-tests, 3 hangs, 2 too-few-wrong-fixes, 1 too-broad | 0.0 min (cached re-run) |
-| click | multi-bug (2 bugs) | 1 | 3 | 2 | no rejected groups; single-bug pool: 6 validated from 13 (5 undetected, 1 too-few-wrong-fixes, 1 weak-tests) | 0.0 min (cached re-run) |
-| click | multi-bug (3 bugs) | 1 | 2 | 1 | no rejected groups; single-bug pool: 6 validated from 12 (2 undetected, 1 hangs, 1 too-few-wrong-fixes, 1 weak-tests) | 13.0 min |
+| click | multi-bug (2 bugs) | 1 | 3 | 2 | no rejected groups; single-bug pool: 6 validated from 18 (6 undetected, 2 too-few-wrong-fixes, 1 weak-tests) | 0.0 min (cached re-run) |
+| click | multi-bug (3 bugs) | 1 | 2 | 1 | no rejected groups; single-bug pool: 6 validated from 14 (3 undetected, 2 too-few-wrong-fixes, 1 hangs, 1 weak-tests) | 0.4 min (cached re-run) |
+| click | test-writing | 1 | 8 | 3 | 3 oracle-not-rigorous, 1 cheat-test-passes, 1 oracle-invalid; single-bug pool: 9 validated from 20 (6 undetected, 2 weak-tests) | 10.9 min |
 | jsoncpp | bug-injection | 1 | 13 | 3 | 3 too-few-wrong-fixes, 3 undetected, 2 build-failure, 2 weak-tests | 0.6 min |
 | jsoncpp | function-removal | 1 | 9 | 3 | 4 weak-tests, 1 too-few-wrong-fixes | 0.0 min (cached re-run) |
-| jsoncpp | multi-bug (2 bugs) | 1 | 3 | 2 | no rejected groups; single-bug pool: 6 validated from 33 (8 undetected, 7 too-few-wrong-fixes, 6 weak-tests, 2 build-failure, 2 too-broad, 1 hangs) | 9.7 min |
-| jsoncpp | multi-bug (3 bugs) | 1 | 2 | 1 | no rejected groups; single-bug pool: 6 validated from 42 (11 too-few-wrong-fixes, 10 weak-tests, 7 undetected, 4 too-broad, 2 build-failure) | 9.5 min |
+| jsoncpp | multi-bug (2 bugs) | 1 | 3 | 2 | no rejected groups; single-bug pool: 6 validated from 33 (8 undetected, 7 too-few-wrong-fixes, 6 weak-tests, 2 build-failure, 2 too-broad, 1 hangs) | 0.1 min (cached re-run) |
+| jsoncpp | multi-bug (3 bugs) | 1 | 2 | 1 | no rejected groups; single-bug pool: 6 validated from 42 (11 too-few-wrong-fixes, 10 weak-tests, 7 undetected, 4 too-broad, 2 build-failure) | 0.0 min (cached re-run) |
 | zod | bug-injection | 1 | 6 | 2 | 3 undetected | 6.8 min |
 | zod | function-removal | 1 | 15 | 2 | 7 too-few-wrong-fixes, 5 weak-tests, 1 too-broad | 13.6 min |
-| zod | multi-bug (2 bugs) | 1 | 2 | 1 | no rejected groups; single-bug pool: 4 validated from 13 (5 undetected, 3 too-few-wrong-fixes) | 30.5 min |
+| zod | multi-bug (2 bugs) | 1 | 2 | 1 | no rejected groups; single-bug pool: 4 validated from 13 (5 undetected, 3 too-few-wrong-fixes) | 0.1 min (cached re-run) |
 
-**Total: 23 tasks accepted from 186 candidates.** Rejection reasons:
-- 34 × undetected: no test notices the change
+**Total: 26 tasks accepted from 221 candidates.** Rejection reasons:
+- 42 × undetected: no test notices the change
 - 8 × too-broad: change breaks too much of the suite
 - 6 × build-failure: code no longer builds/loads
 - 5 × hangs: run exceeded the time limit (hang or extreme slowdown)
-- 33 × weak-tests: tests accept too many wrong fixes
-- 36 × too-few-wrong-fixes: fewer than 3 wrong fixes could be built
+- 35 × weak-tests: tests accept too many wrong fixes
+- 38 × too-few-wrong-fixes: fewer than 3 wrong fixes could be built
+- 1 × oracle-invalid: test-writing: reference test does not pass/fail as required
+- 3 × oracle-not-rigorous: test-writing: reference test rejects too few wrong implementations
+- 1 × cheat-test-passes: test-writing: a cheating test (no assertion / always fails / source peek) would earn credit
 
 ## Accepted tasks
 
@@ -37,6 +41,9 @@
 | `click-multi-format-pos-resolve-incomplete-02fc06` | python | multi-bug | `ProgressBar.format_pos, _resolve_incomplete` | ProgressBar.format_pos: `is not` -> `is`; _resolve_incomplete: `and` -> `or` | 2 | 33 | 2570 | 6/8 (incl. 2 partial) | hard (3) |
 | `click-multi-init-eta-format-message-dc9e6a` | python | multi-bug | `HelpFormatter.__init__, ProgressBar.eta, MissingParameter.format_message` | HelpFormatter.__init__: `0` -> `1`; ProgressBar.eta: `-` -> `+`; MissingParameter.format_message: `is not` -> `is` | 3 | 46 | 2557 | 12/12 (incl. 6 partial) | hard (5) |
 | `click-multi-wrap-chunks-normalize-choice-da1e60` | python | multi-bug | `TextWrapper._wrap_chunks, Choice.normalize_choice` | TextWrapper._wrap_chunks: `+` -> `-`; Choice.normalize_choice: `and` -> `or` | 2 | 290 | 2313 | 8/8 (incl. 2 partial) | hard (3) |
+| `click-test-parameter-get-default-a03ebe` | python | test-writing | `Parameter.get_default` | `and` -> `or` | 1 | 1 | 0 | 3/3 cheat tests; hidden wrong impls: 5, reference test rigor 1.0 | hard (3) |
+| `click-test-pipepager-547cd1` | python | test-writing | `_pipepager` | `and` -> `or` | 1 | 6 | 0 | 3/3 cheat tests; hidden wrong impls: 6, reference test rigor 1.0 | medium (2) |
+| `click-test-textwrapper-wrap-chunks-599ced` | python | test-writing | `TextWrapper._wrap_chunks` | `1` -> `2` | 1 | 10 | 0 | 3/3 cheat tests; hidden wrong impls: 6, reference test rigor 1.0 | medium (2) |
 | `jsoncpp-bug-fastwriter-writevalue-be51db` | cpp | bug-injection | `FastWriter::writeValue` | `!=` -> `==` | 1 | 5 | 335 | 6/6 | easy (0) |
 | `jsoncpp-bug-ourreader-getlocationlineandcolumn-e0d025` | cpp | bug-injection | `OurReader::getLocationLineAndColumn` | `==` -> `!=` | 1 | 1 | 339 | 6/6 | medium (1) |
 | `jsoncpp-bug-value-czstring-operator-95f29e` | cpp | bug-injection | `Value::CZString::operator==` | removed `!` | 1 | 52 | 288 | 5/6 | easy (-1) |
@@ -54,11 +61,11 @@
 
 ## Diversity
 
-- Languages: {'python': 9, 'cpp': 9, 'typescript': 5}
-- Task kinds: {'bug-injection': 8, 'function-removal': 8, 'multi-bug': 7}
-- Difficulty (static score: locations, files, lines, failure signal): {'easy': 6, 'medium': 9, 'hard': 8}
-- Distinct source files: 16; distinct functions: 32
+- Languages: {'python': 12, 'cpp': 9, 'typescript': 5}
+- Task kinds: {'bug-injection': 8, 'function-removal': 8, 'multi-bug': 7, 'test-writing': 3}
+- Difficulty (static score: locations, files, lines, failure signal): {'easy': 6, 'medium': 11, 'hard': 9}
+- Distinct source files: 16; distinct functions: 34
 
 ## Harbor verification
 
-23/23 generated tasks pass Harbor's oracle (=1) and no-op (=0) runs.
+26/26 generated tasks pass Harbor's oracle (=1) and no-op (=0) runs.

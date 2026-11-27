@@ -14,6 +14,7 @@ RUN --mount=type=bind,source=vendor,target=/vendor \
     && printf 'Metadata-Version: 2.1\nName: click\nVersion: 8.6.0.dev0\n' > "$site/click-8.6.0.dev0.dist-info/METADATA"
 
 COPY test.sh collect_results.py grade.py f2p.txt p2p.txt /tests/
+COPY defects.json partial_credit.py /tests/
 RUN chmod +x /tests/test.sh
 
 ENV PYTHONPATH=/app/src \

@@ -16,6 +16,7 @@ RUN --mount=type=bind,source=vendor,target=/vendor \
     && rm -rf /app/packages/zod/src
 
 COPY test.sh grade.mjs f2p.txt p2p.txt /tests/
+COPY defects.json partial_credit.mjs /tests/
 RUN chmod +x /tests/test.sh
 
 WORKDIR /app

@@ -1,6 +1,6 @@
 {
-  "tasks": 9,
-  "passed": 9,
+  "tasks": 12,
+  "passed": 12,
   "results": {
     "click-bug-make-default-short-help-751aba": {
       "oracle": 1,
@@ -43,6 +43,21 @@
       "ok": true
     },
     "click-multi-wrap-chunks-normalize-choice-da1e60": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "click-test-parameter-get-default-a03ebe": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "click-test-pipepager-547cd1": {
+      "oracle": 1,
+      "nop": 0,
+      "ok": true
+    },
+    "click-test-textwrapper-wrap-chunks-599ced": {
       "oracle": 1,
       "nop": 0,
       "ok": true

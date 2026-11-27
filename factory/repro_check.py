@@ -33,6 +33,8 @@ def main() -> int:
     ap.add_argument("--strategy", required=True)
     ap.add_argument("--count", type=int, default=3)
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--bugs", type=int, default=2)
+    ap.add_argument("--adversarial", type=int, default=6)
     args = ap.parse_args()
     outs = []
     with tempfile.TemporaryDirectory() as tmp:
@@ -40,11 +42,21 @@ def main() -> int:
             out = Path(tmp) / f"run{i}"
             subprocess.run([sys.executable, str(ROOT / "factory" / "generate.py"), "--repo", args.repo,
                             "--strategy", args.strategy, "--count", str(args.count), "--seed", str(args.seed),
+                            "--bugs", str(args.bugs), "--adversarial", str(args.adversarial),
                             "--out", str(out)], check=False, capture_output=True)
             outs.append(tree_hashes(out))
     same = outs[0] == outs[1] and bool(outs[0])
     tasks = sorted({k.split("/")[1] for k in outs[0] if k.count("/") >= 2})
     print(f"[{'OK' if same else 'FAIL'}] {len(outs[0])} files across {len(tasks)} tasks; identical: {same}")
+    # record the result for the rigor certificate (factory/certify.py)
+    import datetime
+    import json
+    record_file = ROOT / "validation" / "repro-checks.json"
+    records = json.loads(record_file.read_text()) if record_file.exists() else {}
+    key = f"{args.repo}:{args.strategy}" + (f":{args.bugs}bugs" if args.strategy == "multi-bug" else "") + f":seed{args.seed}"
+    records[key] = {"identical": same, "files": len(outs[0]), "tasks": len(tasks),
+                    "checked": datetime.date.today().isoformat()}
+    record_file.write_text(json.dumps(dict(sorted(records.items())), indent=2) + "\n")
     if not same:
         for k in sorted(set(outs[0]) | set(outs[1])):
             if outs[0].get(k) != outs[1].get(k):

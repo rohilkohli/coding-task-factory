@@ -1,0 +1,56 @@
+schema_version = "1.4"
+artifacts = [{ source = "/app/regression" }]
+
+[task]
+name = "coding-task-factory/click-test-parameter-get-default-a03ebe"
+version = "1.0.0"
+description = "Write a rigorous regression test exposing a defect in Parameter.get_default"
+authors = []
+keywords = ["python", "click", "test-writing", "generated"]
+
+[metadata]
+generator = "test-writing"
+seed = 1
+source_repo = "https://github.com/pallets/click"
+source_commit = "08b803cf32ceb2ae6a772c62d5da42757a897d44"
+language = "python"
+file = "src/click/core.py"
+function = "Parameter.get_default"
+line = 2632
+change = "`and` -> `or`"
+f2p_tests = 1
+p2p_tests = 0
+removed_test_functions = 1
+wrong_implementations = 5
+oracle_rigor = 1.0
+min_rigor = 0.75
+adversarial_mutants = 3
+adversarial_killed = 3
+partial_fixes_rejected = 0
+difficulty = "hard"
+difficulty_score = 3
+difficulty_explanation = "Static estimate (score 3): infer intended behaviour of Parameter.get_default without its tests; 5 hidden wrong implementations to reject; the removed tests had 1 case(s)."
+change_locations = 1
+change_files = 1
+change_lines = 1
+category = "test-writing"
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "separate"
+
+[verifier.environment]
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048
+
+[agent]
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900.0
+os = "linux"
+cpus = 1
+memory_mb = 2048

@@ -19,3 +19,6 @@ node node_modules/vitest/vitest.mjs run --project zod \
   > /logs/verifier/vitest.log 2>&1
 
 node /tests/grade.mjs
+
+# Per-defect partial credit (multi-bug tasks)
+node /tests/partial_credit.mjs

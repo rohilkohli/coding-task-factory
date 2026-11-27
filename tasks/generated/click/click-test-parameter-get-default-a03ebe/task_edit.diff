@@ -1,0 +1,62 @@
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -2654,7 +2654,7 @@
+         """
+         value = ctx.lookup_default(self.name, call=False)
+ 
+-        if value is None and not ctx._default_map_has(self.name):
++        if value is None or not ctx._default_map_has(self.name):
+             value = self.default
+ 
+         if call and callable(value):
+--- a/tests/test_defaults.py
++++ b/tests/test_defaults.py
+@@ -411,48 +411,6 @@
+     assert "source=DEFAULT" in result.output
+ 
+ 
+-def test_lookup_default_override_respected(runner):
+-    """A subclass override of ``lookup_default()`` should be called by Click
+-    internals, not bypassed by a private method.
+-
+-    Reproduce the case of a subclass that falls back to prefix-based lookup when the
+-    parent returns ``None``.
+-    """
+-
+-    class CustomContext(click.Context):
+-        def lookup_default(self, name, call=True):
+-            default = super().lookup_default(name, call=call)
+-
+-            if default is not None:
+-                return default
+-
+-            # Prefix-based fallback: look up "app" sub-dict for "app_email".
+-            prefix = name.split("_", 1)[0]
+-            group = getattr(self, "default_map", None) or {}
+-            sub = group.get(prefix)
+-            if isinstance(sub, dict):
+-                return sub.get(name)
+-            return default
+-
+-    @click.command("get-views")
+-    @click.option("--app-email", default="original", show_default=True)
+-    @click.pass_context
+-    def cli(ctx, app_email):
+-        click.echo(f"app_email={app_email!r}")
+-
+-    cli.context_class = CustomContext
+-    default_map = {"app": {"app_email": "prefix@example.com"}}
+-
+-    # resolve_ctx path: the override provides the runtime value.
+-    result = runner.invoke(cli, [], default_map=default_map)
+-    assert not result.exception
+-    assert "app_email='prefix@example.com'" in result.output
+-
+-    # get_default path: the override is also used when
+-    # rendering --help with show_default=True.
+-    result = runner.invoke(cli, ["--help"], default_map=default_map)
+-    assert not result.exception
+-    assert "prefix@example.com" in result.output
+ 
+ 
+ class _Marker:

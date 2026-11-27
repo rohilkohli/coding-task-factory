@@ -1,0 +1,74 @@
+{
+  "click:bug-injection:seed1": {
+    "identical": true,
+    "files": 72,
+    "tasks": 3,
+    "checked": "2026-11-27"
+  },
+  "click:function-removal:seed1": {
+    "identical": true,
+    "files": 72,
+    "tasks": 3,
+    "checked": "2026-11-27"
+  },
+  "click:multi-bug:2bugs:seed1": {
+    "identical": true,
+    "files": 54,
+    "tasks": 2,
+    "checked": "2026-11-27"
+  },
+  "click:multi-bug:3bugs:seed1": {
+    "identical": true,
+    "files": 28,
+    "tasks": 1,
+    "checked": "2026-11-27"
+  },
+  "click:test-writing:seed1": {
+    "identical": true,
+    "files": 89,
+    "tasks": 3,
+    "checked": "2026-11-27"
+  },
+  "jsoncpp:bug-injection:seed1": {
+    "identical": true,
+    "files": 42,
+    "tasks": 3,
+    "checked": "2026-11-27"
+  },
+  "jsoncpp:function-removal:seed1": {
+    "identical": true,
+    "files": 42,
+    "tasks": 3,
+    "checked": "2026-11-27"
+  },
+  "jsoncpp:multi-bug:2bugs:seed1": {
+    "identical": true,
+    "files": 34,
+    "tasks": 2,
+    "checked": "2026-11-27"
+  },
+  "jsoncpp:multi-bug:3bugs:seed1": {
+    "identical": true,
+    "files": 18,
+    "tasks": 1,
+    "checked": "2026-11-27"
+  },
+  "zod:bug-injection:seed1": {
+    "identical": true,
+    "files": 30,
+    "tasks": 2,
+    "checked": "2026-11-27"
+  },
+  "zod:function-removal:seed1": {
+    "identical": true,
+    "files": 30,
+    "tasks": 2,
+    "checked": "2026-11-27"
+  },
+  "zod:multi-bug:2bugs:seed1": {
+    "identical": true,
+    "files": 18,
+    "tasks": 1,
+    "checked": "2026-11-27"
+  }
+}

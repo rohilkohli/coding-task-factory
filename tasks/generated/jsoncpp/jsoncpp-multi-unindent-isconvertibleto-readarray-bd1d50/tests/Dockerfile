@@ -9,6 +9,7 @@ RUN --mount=type=bind,source=vendor,target=/vendor \
     && rm -rf /app/src/lib_json /app/include
 
 COPY test.sh run_tests.py grade.py f2p.txt p2p.txt /tests/
+COPY defects.json partial_credit.py /tests/
 RUN chmod +x /tests/test.sh
 
 WORKDIR /app

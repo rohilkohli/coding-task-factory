@@ -69,7 +69,7 @@ from common import _open_archive  # noqa: E402
 from repos import REPOS, RepoConfig  # noqa: E402
 
 LOCK = threading.Lock()
-SHORT = {"bug-injection": "bug", "function-removal": "impl", "multi-bug": "multi"}
+SHORT = {"bug-injection": "bug", "function-removal": "impl", "multi-bug": "multi", "test-writing": "test"}
 
 
 def sha(*parts: str) -> str:
@@ -391,6 +391,21 @@ def _deterministic_tar(tree: Path, edits: dict[str, str]) -> bytes:
                     tar.addfile(info, fh)
             else:
                 tar.addfile(info)
+        existing = {str(p.relative_to(tree)) for p in paths}
+        added_dirs: set[str] = set()
+        for rel in sorted(r for r in edits if r not in existing):
+            parts = Path(rel).parts
+            for i in range(1, len(parts)):
+                d = "/".join(parts[:i])
+                if d not in existing and d not in added_dirs:
+                    info = tarfile.TarInfo(f"{tree.name}/{d}")
+                    info.type, info.mode = tarfile.DIRTYPE, 0o755
+                    tar.addfile(info)
+                    added_dirs.add(d)
+            data = edits[rel].encode()
+            info = tarfile.TarInfo(f"{tree.name}/{rel}")
+            info.size, info.mode = len(data), 0o644
+            tar.addfile(info, io.BytesIO(data))
     return buf.getvalue()
 
 
@@ -463,6 +478,22 @@ def instruction(cfg: RepoConfig, cand: Candidate, f2p: list[str], texts: dict[st
     )
 
 
+def add_partial_credit(cfg: RepoConfig, task: Path, defects: list[dict]) -> None:
+    """Per-defect partial credit, added to this task's verifier only (the shared
+    screening image is untouched, so cached test runs stay valid)."""
+    script = "partial_credit.mjs" if cfg.language == "typescript" else "partial_credit.py"
+    runner = "node" if cfg.language == "typescript" else "python3"
+    shutil.copy2(FACTORY / "templates" / "common" / script, task / "tests" / script)
+    (task / "tests" / "defects.json").write_text(json.dumps(defects, indent=1) + "\n")
+    dockerfile = task / "tests" / "Dockerfile"
+    lines = dockerfile.read_text().splitlines()
+    last_copy = max(i for i, line in enumerate(lines) if line.startswith("COPY ") and "/tests/" in line)
+    lines.insert(last_copy + 1, f"COPY defects.json {script} /tests/")
+    dockerfile.write_text("\n".join(lines) + "\n")
+    test_sh = task / "tests" / "test.sh"
+    test_sh.write_text(test_sh.read_text().rstrip("\n") + f"\n\n# Per-defect partial credit (multi-bug tasks)\n{runner} /tests/{script}\n")
+
+
 def toml_str(value) -> str:
     return json.dumps(value) if isinstance(value, str) else str(value).lower() if isinstance(value, bool) else str(value)
 
@@ -491,6 +522,8 @@ def package(cfg: RepoConfig, cand: Candidate, f2p: list[str], p2p: list[str], ad
         (shutil.copytree if src.is_dir() else shutil.copy2)(src, task / "tests" / "vendor" / extra)
     (task / "tests" / "f2p.txt").write_text("\n".join(f2p) + "\n")
     (task / "tests" / "p2p.txt").write_text("\n".join(p2p) + "\n")
+    if adv.get("defects"):
+        add_partial_credit(cfg, task, adv["defects"])
 
     # reference solution: the pristine upstream files
     copies = []
@@ -582,6 +615,219 @@ def compose_groups(cfg: RepoConfig, singles: list[Candidate], bugs: int, texts: 
                         injected=[x for g in group for x in g.injected], parts=group)
 
 
+# ----------------------------------------------------------------------------
+# Test-writing tasks (Python): "write a rigorous regression test"
+
+TW_README = """Put your regression test in this directory as `test_regression.py` (pytest).
+
+During grading the file is copied into `/app/tests/`, so the fixtures defined
+in `tests/conftest.py` (for example `runner`) are available to it.
+"""
+
+
+def testwriting_instruction(cfg: RepoConfig, cand: Candidate, info: dict) -> str:
+    fn = cand.functions[0]
+    return (
+        f"A defect has been introduced into `{fn.name}` in `{fn.file}` of the {cfg.project} library in `/app`. "
+        "The project's tests that would have caught it have been removed. Your job is **not** to fix the "
+        "defect, but to write a regression test that exposes it.\n\n"
+        "Create `/app/regression/test_regression.py` (pytest) with one or more tests that:\n\n"
+        "1. **fail** on the current code, because of the defect, and\n"
+        f"2. **pass** once `{fn.name}` behaves correctly again.\n\n"
+        "Grading runs your test file against the correct implementation, the current defective one, and "
+        f"{info['wrong_count']} other plausible-but-wrong implementations of the same code that you cannot see. "
+        "Your tests earn credit only if they pass on the correct implementation, fail on the defective one, "
+        f"**and** fail on at least {int(info['min_rigor'] * 100)}% of the wrong implementations. Pin down the "
+        "intended behaviour precisely; assertions about the source text rather than behaviour will not meet "
+        "the bar. Do not modify the library source, which is ignored for grading.\n\n"
+        "Your file is run from `/app/tests/` during grading, so the fixtures in `tests/conftest.py` (for "
+        "example `runner`) are available. To try it locally: `cp /app/regression/test_regression.py "
+        "/app/tests/ && cd /app && python -m pytest tests/test_regression.py`.\n"
+    )
+
+
+def package_testwriting(cfg: RepoConfig, cand: Candidate, f2p: list[str], info: dict, upstream: Path,
+                        texts: dict[str, str], out_root: Path, seed: int) -> Path:
+    fn = cand.functions[0]
+    cid = f"{cfg.name}-test-{slug(fn.name)}-{sha(cand.id, 'test-writing')[:6]}"
+    task = out_root / cid
+    if task.exists():
+        shutil.rmtree(task)
+    shutil.copytree(FACTORY / "templates" / cfg.name / "environment", task / "environment")
+    (task / "environment" / "vendor").mkdir()
+    write_archive(cfg, upstream, {**info["edits"], "regression/README.md": TW_README},
+                  task / "environment" / "vendor" / f"app-base.{cfg.archive_ext}")
+    for extra in cfg.env_vendor:
+        src = FACTORY / "vendor" / cfg.name / extra
+        (shutil.copytree if src.is_dir() else shutil.copy2)(src, task / "environment" / "vendor" / extra)
+
+    shutil.copytree(FACTORY / "templates" / f"{cfg.name}-testwriting" / "tests", task / "tests")
+    write_variants(task / "tests" / "variants", info["variants"])
+    (task / "tests" / "rigor.json").write_text(json.dumps({"min_rigor": info["min_rigor"]}) + "\n")
+    (task / "tests" / "vendor").mkdir()
+    shutil.copy2(FACTORY / "vendor" / cfg.name / f"app-upstream.{cfg.archive_ext}", task / "tests" / "vendor")
+    for extra in cfg.tests_vendor:
+        src = FACTORY / "vendor" / cfg.name / extra
+        (shutil.copytree if src.is_dir() else shutil.copy2)(src, task / "tests" / "vendor" / extra)
+    (task / "tests" / "test.sh").chmod(0o755)
+
+    sol = task / "solution" / "files" / "regression" / "test_regression.py"
+    sol.parent.mkdir(parents=True)
+    sol.write_text(info["oracle"])
+    (task / "solution" / "solve.sh").write_text(
+        "#!/bin/bash\n# Reference solution: the upstream tests for this behaviour, as one regression file\n"
+        f"# ({cfg.url} @ {cfg.commit}).\nset -euo pipefail\nmkdir -p /app/regression\n"
+        "cp /solution/files/regression/test_regression.py /app/regression/test_regression.py\n")
+    (task / "solution" / "solve.sh").chmod(0o755)
+    (task / "instruction.md").write_text(testwriting_instruction(cfg, cand, info))
+    diff = "".join("".join(difflib.unified_diff(texts.get(rel, (upstream / rel).read_text()).splitlines(keepends=True),
+                                                 new.splitlines(keepends=True), f"a/{rel}", f"b/{rel}"))
+                   for rel, new in sorted(info["edits"].items()))
+    (task / "task_edit.diff").write_text(diff)
+
+    signal = len(display_tests(f2p, limit=10 ** 6))
+    score = 1 + (1 if signal <= 2 else 0) + (1 if info["wrong_count"] >= 5 else 0)
+    level = "easy" if score <= 0 else "medium" if score <= 2 else "hard"
+    why = (f"Static estimate (score {score}): infer intended behaviour of {fn.name} without its tests; "
+           f"{info['wrong_count']} hidden wrong implementations to reject; the removed tests had {signal} case(s).")
+    r = cfg.resources
+    meta = {
+        "generator": "test-writing", "seed": seed, "source_repo": cfg.url, "source_commit": cfg.commit,
+        "language": cfg.language, "file": fn.file, "function": fn.name, "line": fn.line,
+        "change": cand.description, "f2p_tests": len(f2p), "p2p_tests": 0,
+        "removed_test_functions": info["removed_functions"], "wrong_implementations": info["wrong_count"],
+        "oracle_rigor": info["oracle_rigor"], "min_rigor": info["min_rigor"],
+        "adversarial_mutants": len(info["cheats"]), "adversarial_killed": sum(1 for v in info["cheats"].values() if v == 0),
+        "partial_fixes_rejected": 0,
+        "difficulty": level, "difficulty_score": score, "difficulty_explanation": why,
+        "change_locations": 1, "change_files": 1, "change_lines": 1, "category": "test-writing",
+    }
+    toml = [
+        'schema_version = "1.4"', 'artifacts = [{ source = "/app/regression" }]', "", "[task]",
+        f'name = "coding-task-factory/{cid}"', 'version = "1.0.0"',
+        f"description = {toml_str(f'Write a rigorous regression test exposing a defect in {fn.name}')}",
+        "authors = []", f'keywords = ["{cfg.language}", "{cfg.name}", "test-writing", "generated"]', "",
+        "[metadata]", *[f"{k} = {toml_str(v)}" for k, v in meta.items()], "",
+        "[verifier]", f"timeout_sec = {float(r['verifier_timeout'])}", 'environment_mode = "separate"', "",
+        "[verifier.environment]", "build_timeout_sec = 900.0", 'os = "linux"',
+        f"cpus = {r['cpus']}", f"memory_mb = {r['memory_mb']}", "",
+        "[agent]", "timeout_sec = 1800.0", "",
+        "[environment]", 'network_mode = "public"', "build_timeout_sec = 900.0", 'os = "linux"',
+        f"cpus = {r['cpus']}", f"memory_mb = {r['memory_mb']}", "",
+    ]
+    (task / "task.toml").write_text("\n".join(toml))
+    return task
+
+def test_module_path(test_id: str) -> str:
+    """'tests.test_utils.test_style::test_x[p]' -> 'tests/test_utils/test_style.py'."""
+    return test_id.split("::", 1)[0].replace(".", "/") + ".py"
+
+
+def test_function(test_id: str) -> str:
+    return test_id.split("::", 1)[1].split("[", 1)[0]
+
+
+def drop_functions(text: str, names: set[str]) -> str:
+    """Module text without the given top-level test functions (decorators included)."""
+    tree = ast.parse(text)
+    lines = text.splitlines(keepends=True)
+    spans = []
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name in names:
+            start = min([node.lineno] + [d.lineno for d in node.decorator_list])
+            spans.append((start, node.end_lineno))
+    for start, end in sorted(spans, reverse=True):
+        del lines[start - 1:end]
+    out = "".join(lines)
+    ast.parse(out)
+    return out
+
+
+def oracle_module(text: str, module: str, stable: set[str], all_ids: set[str]) -> str:
+    """The upstream test module restricted to test functions whose every case passes reliably."""
+    tree = ast.parse(text)
+    keep_out = set()
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test"):
+            ids = {t for t in all_ids if t.startswith(module + "::") and test_function(t) == node.name}
+            if not ids or not ids <= stable:
+                keep_out.add(node.name)
+    return drop_functions(text, keep_out)
+
+
+def testwriter_image(cfg: RepoConfig) -> str:
+    template = FACTORY / "templates" / f"{cfg.name}-testwriting" / "tests"
+    vendor = FACTORY / "vendor" / cfg.name
+    files = sorted(p for p in template.rglob("*") if p.is_file())
+    digest = sha(*(f"{p.relative_to(template)}:{hashlib.sha256(p.read_bytes()).hexdigest()}" for p in files),
+                 *(hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(vendor.rglob("*")) if p.is_file()))
+    tag = f"factory-testwriter-{cfg.name}:{digest[:12]}"
+    if subprocess.run(["docker", "image", "inspect", tag], capture_output=True).returncode != 0:
+        with tempfile.TemporaryDirectory() as ctx:
+            ctx = Path(ctx)
+            shutil.copytree(template, ctx, dirs_exist_ok=True)
+            (ctx / "vendor").mkdir(exist_ok=True)
+            shutil.copy2(vendor / f"app-upstream.{cfg.archive_ext}", ctx / "vendor")
+            for extra in cfg.tests_vendor:
+                src = vendor / extra
+                (shutil.copytree if src.is_dir() else shutil.copy2)(src, ctx / "vendor" / extra)
+            subprocess.run(["docker", "build", "-q", "-t", tag, str(ctx)], check=True, capture_output=True)
+    return tag
+
+
+def write_variants(root: Path, variants: dict[str, dict[str, str]]) -> None:
+    for name, files in variants.items():
+        (root / name).mkdir(parents=True, exist_ok=True)
+        for rel, text in files.items():
+            (root / name / rel).parent.mkdir(parents=True, exist_ok=True)
+            (root / name / rel).write_text(text)
+
+
+def screen_tests(cfg: RepoConfig, image: str, variants: dict[str, dict[str, str]],
+                 tests: dict[str, str]) -> dict:
+    """Grade candidate test files against the variants in the test-writing verifier (cached)."""
+    key = sha(image, json.dumps(variants, sort_keys=True), json.dumps(tests, sort_keys=True))
+    cache = CACHE / cfg.name / "twruns" / f"{key}.json"
+    if cache.exists():
+        return json.loads(cache.read_text())
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        write_variants(tmp / "variants", variants)
+        (tmp / "cands").mkdir()
+        for name, text in tests.items():
+            (tmp / "cands" / f"{name}.py").write_text(text)
+        (tmp / "out").mkdir()
+        subprocess.run(["docker", "run", "--rm", "--network", "none",
+                        "-v", f"{tmp / 'variants'}:/tests/variants", "-v", f"{tmp / 'cands'}:/cands",
+                        "-v", f"{tmp / 'out'}:/out", image, "python3", "/tests/run_variants.py",
+                        "--tests-dir", "/cands", "--variants", "/tests/variants", "--config", "/tests/rigor.json",
+                        "--out", "/out"], capture_output=True, timeout=1800)
+        out_file = tmp / "out" / "screening.json"
+        result = json.loads(out_file.read_text()) if out_file.exists() else {}
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.write_text(json.dumps(result))
+    return result
+
+
+def cheat_tests(cand: Candidate, texts: dict[str, str]) -> dict[str, str]:
+    """Test files that must NOT earn reward: no assertion, always failing, and
+    one that pins the source text around the defect instead of behaviour."""
+    site, _ = cand.injected[0]
+    text = texts[cand.files[0]]
+    line_start = text.rfind("\n", 0, site.start) + 1
+    line_end = text.find("\n", site.end)
+    original_line = text[line_start:line_end].strip()
+    rel = cand.files[0]
+    return {
+        "cheat_no_assertion": "def test_nothing():\n    pass\n",
+        "cheat_always_fails": "def test_fails():\n    assert False\n",
+        "cheat_source_peek": (
+            "from pathlib import Path\n\n\ndef test_source_unchanged():\n"
+            f"    src = (Path(__file__).resolve().parents[1] / {rel!r}).read_text()\n"
+            f"    assert {original_line!r} in src\n"),
+    }
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--repo", required=True, choices=sorted(REPOS))
@@ -594,6 +840,8 @@ def main() -> int:
     ap.add_argument("--min-wrong-fixes", type=int, default=3)
     ap.add_argument("--min-kill-rate", type=float, default=0.75)
     ap.add_argument("--max-f2p-fraction", type=float, default=0.25)
+    ap.add_argument("--min-rigor", type=float, default=0.75,
+                    help="test-writing: share of hidden wrong implementations a test must reject")
     ap.add_argument("--workers", type=int, default=0)
     ap.add_argument("--out", type=Path, default=ROOT / "tasks" / "generated")
     args = ap.parse_args()
@@ -672,6 +920,8 @@ def main() -> int:
         rate = (killed + partial_killed) / total
         adv = {"mutants": total, "killed": killed + partial_killed, "kill_rate": round(rate, 3),
                "partial_fixes": len(must), "partial_killed": partial_killed, "survivors": survivors}
+        if cand.parts:
+            adv["defects"] = defect_tests(cand, f2p)
         rec.update(adversarial=adv)
         if partial_killed < len(must):
             return {**rec, "status": "rejected", "reason": "masked-bugs"}
@@ -679,6 +929,21 @@ def main() -> int:
             return {**rec, "status": "rejected", "reason": "weak-tests"}
         rec["_payload"] = (cand, f2p, p2p, adv)
         return {**rec, "status": "accepted"}
+
+    def defect_tests(cand: Candidate, f2p: list[str]) -> list[dict]:
+        """Tests each defect breaks on its own (exclusive ones when it has any)."""
+        per = []
+        for part in cand.parts:
+            pf = apply_edits(texts, part.edits)
+            res = run_tests(cfg, image, upstream, pf, edits_key("cand", pf), run_timeout)
+            per.append(set(stable - passed(res)) & set(f2p))
+        out = []
+        for i, part in enumerate(cand.parts):
+            others = set().union(*(per[j] for j in range(len(per)) if j != i))
+            own = per[i] - others
+            out.append({"function": part.functions[0].name, "file": part.files[0], "change": part.description,
+                        "tests": sorted(own or per[i])})
+        return out
 
     def run_stage(candidates, target: int, max_attempts: int, label: str) -> tuple[list, list, int]:
         """Evaluate candidates in parallel until `target` are accepted; returns
@@ -720,6 +985,84 @@ def main() -> int:
         return [p for idx, p in accepted if idx in keep], sorted(records, key=lambda r: r["index"]), attempts
 
     singles_stage = None
+    if args.strategy == "test-writing":
+        if cfg.language != "python":
+            log("[FAIL] test-writing tasks are implemented for Python repositories (click) only")
+            return 1
+        tw_image = testwriter_image(cfg)
+        pool_target = args.count * 3
+        pool, pool_records, pool_attempts = run_stage(
+            enumerate_candidates(cfg, "bug-injection", fns, texts, rng), pool_target,
+            args.max_attempts or pool_target * 8, "single")
+        singles_stage = {"candidates_tried": pool_attempts, "validated_bugs": len(pool),
+                         "funnel": funnel(pool_records)}
+        log(f"[..] {len(pool)} validated single bugs for test-writing tasks")
+        all_ids = set(ref1) | set(ref2)
+        accepted_tw, records, attempts = [], [], 0
+        for cand, f2p, _p2p, adv in pool:
+            if len(accepted_tw) >= args.count:
+                break
+            attempts += 1
+            rec = {"index": attempts, "id": cand.id, "file": cand.files[0], "function": cand.function_names,
+                   "change": cand.description, "f2p": len(f2p)}
+            modules: dict[str, set[str]] = {}
+            for t in f2p:
+                if "::" in t and (upstream / test_module_path(t)).exists():
+                    modules.setdefault(test_module_path(t), set()).add(test_function(t))
+            top = sorted(m for m in modules if len(Path(m).parts) == 2)
+            if not top:
+                records.append({**rec, "status": "rejected", "reason": "oracle-unavailable"})
+                log(f"[--] (test) {cand.id:<62} rejected (oracle-unavailable)")
+                continue
+            best = max(top, key=lambda m: len(modules[m]))
+            oracle = oracle_module((upstream / best).read_text(), best[:-3].replace("/", "."), stable, all_ids)
+            edits = {cand.files[0]: apply_edits(texts, cand.edits)[cand.files[0]]}
+            for m, names in modules.items():
+                edits[m] = drop_functions((upstream / m).read_text(), names)
+            _, sampled = wrong_fixes(cfg, cand, texts, random.Random(f"{adv_seed}:{cand.id}"), args.adversarial)
+            killed = [(d, f) for d, f in sampled if d not in adv.get("survivors", [])]
+            if len(killed) < args.min_wrong_fixes:
+                records.append({**rec, "status": "rejected", "reason": "too-few-wrong-fixes"})
+                log(f"[--] (test) {cand.id:<62} rejected (too-few-wrong-fixes)")
+                continue
+            variants = {"reference": {}, "buggy": {cand.files[0]: edits[cand.files[0]]}}
+            for i, (_d, files_) in enumerate(killed, 1):
+                variants[f"wrong_{i}"] = files_
+            cheats = cheat_tests(cand, texts)
+            result = screen_tests(cfg, tw_image, variants, {"oracle": oracle, **cheats})
+            o = result.get("oracle", {})
+            cheat_rewards = {k: result.get(k, {}).get("reward") for k in cheats}
+            rec.update(oracle=o, cheats=cheat_rewards, wrong_implementations=len(killed))
+            if o.get("reward") != 1:
+                reason = "oracle-not-rigorous" if o.get("valid") and o.get("detects_bug") else "oracle-invalid"
+                records.append({**rec, "status": "rejected", "reason": reason})
+                log(f"[--] (test) {cand.id:<62} rejected ({reason}) rigor={o.get('rigor')}")
+                continue
+            if any(v != 0 for v in cheat_rewards.values()):
+                records.append({**rec, "status": "rejected", "reason": "cheat-test-passes"})
+                log(f"[--] (test) {cand.id:<62} rejected (cheat-test-passes) {cheat_rewards}")
+                continue
+            info = {"edits": edits, "variants": variants, "oracle": oracle, "cheats": cheat_rewards,
+                    "wrong_count": len(killed), "oracle_rigor": o.get("rigor"), "min_rigor": args.min_rigor,
+                    "removed_functions": sum(len(v) for v in modules.values())}
+            accepted_tw.append((cand, f2p, info))
+            records.append({**rec, "status": "accepted"})
+            log(f"[OK] (test) {cand.id:<62} accepted oracle_rigor={o.get('rigor')} cheats={cheat_rewards}")
+        out_root = args.out / cfg.name
+        out_root.mkdir(parents=True, exist_ok=True)
+        for cand, f2p, info in accepted_tw:
+            package_testwriting(cfg, cand, f2p, info, upstream, texts, out_root, args.seed)
+        report = {"repo": cfg.name, "strategy": args.strategy, "seed": args.seed, "count_requested": args.count,
+                  "candidates_tried": attempts, "accepted": len(accepted_tw), "funnel": funnel(records),
+                  "reference": {"tests": len(ref1), "stable_passing": len(stable), "flaky": len(flaky)},
+                  "thresholds": {"min_rigor": args.min_rigor, "min_wrong_fixes": args.min_wrong_fixes},
+                  "single_bug_stage": singles_stage, "elapsed_sec": round(time.time() - started, 1),
+                  "candidates": records}
+        report_path = out_root / f"report-test-seed{args.seed}.json"
+        report_path.write_text(json.dumps(report, indent=2) + "\n")
+        log(f"[OK] {len(accepted_tw)}/{args.count} tasks from {attempts} candidates in {report['elapsed_sec']}s; "
+            f"funnel {report['funnel']}; report {report_path.relative_to(ROOT)}")
+        return 0 if len(accepted_tw) == args.count else 2
     if args.strategy == "multi-bug":
         # stage 1: a pool of individually validated single bugs
         pool_target = args.count * args.bugs + args.bugs

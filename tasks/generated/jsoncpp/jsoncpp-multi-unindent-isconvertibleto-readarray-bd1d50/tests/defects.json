@@ -1,0 +1,63 @@
+[
+ {
+  "function": "StyledStreamWriter::unindent",
+  "file": "src/lib_json/json_writer.cpp",
+  "change": "`>=` -> `<=`",
+  "tests": [
+   "data/legacy_test_comment_02.json [StyledStreamWriter]",
+   "unit/StyledStreamWriterTest/writeNestedObjects"
+  ]
+ },
+ {
+  "function": "Value::isConvertibleTo",
+  "file": "src/lib_json/json_value.cpp",
+  "change": "`&&` -> `||`",
+  "tests": [
+   "unit/ValueTest/arrays",
+   "unit/ValueTest/integers",
+   "unit/ValueTest/nonIntegers",
+   "unit/ValueTest/objects",
+   "unit/ValueTest/strings"
+  ]
+ },
+ {
+  "function": "Reader::readArray",
+  "file": "src/lib_json/json_reader.cpp",
+  "change": "`true` -> `false`",
+  "tests": [
+   "data/legacy_test_array_02.json [BuiltStyledStreamWriter]",
+   "data/legacy_test_array_02.json [StyledStreamWriter]",
+   "data/legacy_test_array_02.json [StyledWriter]",
+   "data/legacy_test_array_03.json [BuiltStyledStreamWriter]",
+   "data/legacy_test_array_03.json [StyledStreamWriter]",
+   "data/legacy_test_array_03.json [StyledWriter]",
+   "data/legacy_test_array_04.json [BuiltStyledStreamWriter]",
+   "data/legacy_test_array_04.json [StyledStreamWriter]",
+   "data/legacy_test_array_04.json [StyledWriter]",
+   "data/legacy_test_array_05.json [BuiltStyledStreamWriter]",
+   "data/legacy_test_array_05.json [StyledStreamWriter]",
+   "data/legacy_test_array_05.json [StyledWriter]",
+   "data/legacy_test_array_06.json [BuiltStyledStreamWriter]",
+   "data/legacy_test_array_06.json [StyledStreamWriter]",
+   "data/legacy_test_array_06.json [StyledWriter]",
+   "data/legacy_test_array_07.json [BuiltStyledStreamWriter]",
+   "data/legacy_test_array_07.json [StyledWriter]",
+   "data/legacy_test_comment_00.json [BuiltStyledStreamWriter]",
+   "data/legacy_test_comment_00.json [StyledStreamWriter]",
+   "data/legacy_test_comment_00.json [StyledWriter]",
+   "data/legacy_test_comment_01.json [BuiltStyledStreamWriter]",
+   "data/legacy_test_comment_01.json [StyledWriter]",
+   "data/legacy_test_complex_01.json [BuiltStyledStreamWriter]",
+   "data/legacy_test_complex_01.json [StyledWriter]",
+   "data/legacy_test_large_01.json [BuiltStyledStreamWriter]",
+   "data/legacy_test_large_01.json [StyledWriter]",
+   "data/legacy_test_real_13.json [BuiltStyledStreamWriter]",
+   "data/legacy_test_real_13.json [StyledStreamWriter]",
+   "data/legacy_test_real_13.json [StyledWriter]",
+   "unit/EscapeSequenceTest/readerParseEscapeSequence",
+   "unit/ReaderTest/allowDroppedNullPlaceholders",
+   "unit/ReaderTest/parseString",
+   "unit/ReaderTest/parseWithNoErrorsTestingOffsets"
+  ]
+ }
+]

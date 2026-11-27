@@ -26,6 +26,10 @@ REASONS = {
     "no-adversarial-sites": "no way to construct wrong fixes",
     "too-few-wrong-fixes": "fewer than 3 wrong fixes could be built",
     "masked-bugs": "a partial fix passed (one bug hides another)",
+    "oracle-unavailable": "test-writing: no upstream test module to build a reference test from",
+    "oracle-invalid": "test-writing: reference test does not pass/fail as required",
+    "oracle-not-rigorous": "test-writing: reference test rejects too few wrong implementations",
+    "cheat-test-passes": "test-writing: a cheating test (no assertion / always fails / source peek) would earn credit",
 }
 
 
@@ -81,6 +85,9 @@ def main() -> None:
         for fn in m["function"].split(", "):
             functions[fn] += 1
         partial = f" (incl. {m['partial_fixes_rejected']} partial)" if m.get("partial_fixes_rejected") else ""
+        if m["generator"] == "test-writing":
+            partial = (f" cheat tests; hidden wrong impls: {m['wrong_implementations']}, "
+                       f"reference test rigor {m['oracle_rigor']}")
         change = m["change"].replace("|", "\\|")  # `||` would break the Markdown table
         print(f"| `{t.name}` | {m['language']} | {m['generator']} | `{m['function']}` | {change} | "
               f"{m.get('change_locations', 1)} | {m['f2p_tests']} | {m['p2p_tests']} | "

@@ -28,3 +28,6 @@ g++ "${LIB[@]}" "$BUILD/runner.o" -o "$BUILD/jsontestrunner" >> /logs/verifier/b
 
 python3 /tests/run_tests.py "$BUILD"
 python3 /tests/grade.py
+
+# Per-defect partial credit (multi-bug tasks)
+python3 /tests/partial_credit.py

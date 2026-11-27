@@ -9,3 +9,6 @@ python -m pytest -p no:cacheprovider -q -rA tests \
   > /logs/verifier/pytest.log 2>&1
 python /tests/collect_results.py
 python /tests/grade.py
+
+# Per-defect partial credit (multi-bug tasks)
+python3 /tests/partial_credit.py

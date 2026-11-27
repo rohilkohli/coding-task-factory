@@ -40,7 +40,8 @@ without human or LLM input:
 |---|---|---|
 | `bug-injection` | one realistic single-token defect inside a function (`<` → `<=`, `==` → `!=`, `&&` → `\|\|`, dropped `not`/`!`, `true` → `false`, off-by-one literal) | find and fix the regression; the failing tests are listed |
 | `function-removal` | a function body replaced by a "not implemented" stub; signature and docs kept (for C++, the docs come from the public header) | re-implement the function |
-| `multi-bug` | 2–3 individually validated defects in different functions, preferably different files | find and fix every defect; fixing only some still fails |
+| `multi-bug` | 2–3 individually validated defects in different functions, preferably different files | find and fix every defect; fixing only some still fails (partial credit reported per defect) |
+| `test-writing` (Python) | a validated defect is injected and **the upstream tests that catch it are removed** | write `/app/regression/test_regression.py` that exposes the defect; graded for *rigor* (below) |
 
 Functions and mutation sites are found with each language's own parser.
 Python uses `ast`/`tokenize`, TypeScript uses the TypeScript compiler API, and
@@ -70,6 +71,31 @@ Every candidate passes the same gates as the hand-made tasks before it is kept:
    deterministic tar archive, the reference solution, F2P/P2P lists, the
    instruction, a static difficulty score and full provenance in `task.toml`.
 
+**Test-writing tasks are graded for rigor, not just fail-to-pass.** The
+agent's test file runs against the correct implementation (it must pass), the
+defective one (it must fail) and the task's hidden plausible-but-wrong
+implementations, which it must reject at a rate of at least 75%. Research on
+bug-reproduction tests shows that a test can fail on the bug and pass on the
+fix while still accepting wrong patches ("lax" tests); the rigor requirement
+measures exactly that. A test-writing task is kept only if:
+
+- the reference test, built from the removed upstream tests, earns reward 1;
+  and
+- three cheating tests earn 0: one without assertions, one that always fails,
+  and one that only checks the source text around the defect.
+
+**Per-defect partial credit.** Multi-bug tasks keep a strict binary `reward`
+and also report `defects_fixed`, `defects_total`, `partial_credit` and
+`defect_<i>_fixed`. Each defect is judged by the tests it breaks on its own.
+For example, on a 3-defect task, fixing only one defect gives
+`partial_credit = 0.33`.
+
+**Rigor certificate.** `factory/certify.py` writes `RIGOR.md`, which checks
+every task for rigor (construction), reliability (evaluation) and
+reproducibility (release) from evidence on disk. It also includes a
+contamination disclosure. All 29 tasks (3 hand-made, 26 generated) currently
+pass every applicable check.
+
 **Difficulty score.** This is a static, pre-run estimate. Published studies
 find that task difficulty is predicted mainly by patch fragmentation and patch
 size (see `docs/improvements-research.md`). Points are given for:
@@ -90,23 +116,25 @@ runs Harbor's oracle and no-op agents over a generated set, and
 
 ### Generated batch (seed 1), see `tasks/generated/REPORT.md`
 
-- **23 tasks accepted from 184 candidates.** This count includes the
-  single-bug pools that multi-bug tasks are composed from. Rejections: 36 had
-  too few wrong fixes, 34 went undetected, 32 had weak tests, 8 were too
-  broad, 6 failed to build and 5 timed out.
-- **3 languages:** Python 9, C++ 9, TypeScript 5.
-- **3 kinds:** 8 bug-injection, 8 function-removal and 7 multi-bug (two of
-  them have 3 defects).
-- **Coverage:** 16 source files and 32 distinct functions.
-- **Difficulty (static score):** 6 easy, 9 medium and 8 hard. The first batch
-  had no hard tasks.
+- **26 tasks accepted from 221 candidates.** This count includes the
+  single-bug pools that multi-bug and test-writing tasks are built from.
+  Rejections: 42 went undetected, 38 had too few wrong fixes, 35 had weak
+  tests, 8 were too broad, 6 failed to build and 5 timed out. Test-writing
+  added 5 more: 3 reference tests were not rigorous enough, 1 was invalid
+  and 1 task could be passed by a cheating test.
+- **3 languages:** Python 12, C++ 9, TypeScript 5.
+- **4 kinds:** 8 bug-injection, 8 function-removal, 7 multi-bug (two of
+  them have 3 defects) and 3 test-writing.
+- **Coverage:** 16 source files and 34 distinct functions.
+- **Difficulty (static score):** 6 easy, 11 medium and 9 hard. The first
+  batch had no hard tasks.
 - **Partial fixes:** every multi-bug task rejects every partial fix. That is
   2 partial fixes for 2-bug tasks and 6 for 3-bug tasks.
 - **Harbor checks:** all tasks pass `harbor lint`, and Harbor's oracle (= 1)
   and no-op (= 0) runs.
 - **Reproducibility:** the same seed gives byte-identical tasks.
-  `repro_check.py` confirmed this for click bug-injection, click multi-bug,
-  jsoncpp function-removal and zod bug-injection.
+  `repro_check.py` confirmed this for all 12 repo/strategy combinations in
+  the batch (`validation/repro-checks.json`).
 
 **Effect of the round-2 improvements**, compared with the first batch:
 
